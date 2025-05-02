@@ -243,8 +243,18 @@ export default function Home() {
       <footer className="bg-light-grey border-t border-light-grey py-8">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="mb-4 md:mb-0">
-              <p className="text-charcoal-300">© 2025 TMPL 2.0 - All rights reserved</p>
+            <div className="mb-4 md:mb-0 text-center md:text-left">
+              <p className="text-charcoal-300">
+                Developed by{" "}
+                <span className="font-medium text-charcoal-500">
+                  TM Dulain Gunawardhana
+                </span>
+                <span className="text-charcoal-300"> (PR Manager - Division J)</span>
+                <span className="text-charcoal-300"> & </span>
+                <span className="font-medium text-charcoal-500">
+                  Sathindu Dhanushka
+                </span>
+              </p>
             </div>
             <div className="flex space-x-6">
               <Link href="/" className="text-charcoal-300 hover:text-maroon-500 transition-colors">

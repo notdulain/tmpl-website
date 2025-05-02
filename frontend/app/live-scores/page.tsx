@@ -75,6 +75,44 @@ export default function LiveScores() {
     requiredRunRate: 0,
   }
 
+  // Mock data for previous matches
+  const previousMatches = [
+    {
+      id: "match-1",
+      team1: {
+        name: "Eloquent Eagles",
+        runs: 45,
+        wickets: 3,
+        overs: "4.0"
+      },
+      team2: {
+        name: "Dynamic Dragons",
+        runs: 42,
+        wickets: 4,
+        overs: "4.0"
+      },
+      result: "Eloquent Eagles won by 3 runs",
+      date: "May 10, 2025"
+    },
+    {
+      id: "match-2",
+      team1: {
+        name: "Phoenix Flyers",
+        runs: 38,
+        wickets: 2,
+        overs: "4.0"
+      },
+      team2: {
+        name: "Thunder Titans",
+        runs: 39,
+        wickets: 3,
+        overs: "3.2"
+      },
+      result: "Thunder Titans won by 7 wickets",
+      date: "May 10, 2025"
+    }
+  ]
+
   const handleRefresh = () => {
     setIsRefreshing(true)
     setTimeout(() => setIsRefreshing(false), 1000)
@@ -91,7 +129,7 @@ export default function LiveScores() {
               alt="TMPL Logo"
               width={150}
               height={150}
-              className="rounded-ful"
+              className="rounded-full"
             />
           </Link>
           <Button 
@@ -259,6 +297,48 @@ export default function LiveScores() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Previous Matches Section */}
+        <div className="px-4 md:px-8 py-4 max-w-7xl mx-auto">
+          <h2 className="text-lg md:text-xl font-medium text-[#666666] mb-4">Previous Matches</h2>
+          <div className="space-y-3">
+            {previousMatches.map((match) => (
+              <Card key={match.id} className="bg-white border-[#E5E5E5] shadow-sm">
+                <CardContent className="p-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <div className="text-sm text-[#666666]">{match.date}</div>
+                    <Badge variant="outline" className="text-xs border-[#800000] text-[#800000]">
+                      Completed
+                    </Badge>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <div className="flex-1">
+                        <div className="font-medium">{match.team1.name}</div>
+                        <div className="text-sm text-[#666666]">{match.team1.overs} overs</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-bold text-[#800000]">{match.team1.runs}/{match.team1.wickets}</div>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <div className="flex-1">
+                        <div className="font-medium">{match.team2.name}</div>
+                        <div className="text-sm text-[#666666]">{match.team2.overs} overs</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-bold text-[#800000]">{match.team2.runs}/{match.team2.wickets}</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-2 text-sm font-medium text-[#800000]">
+                    {match.result}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
       </main>
     </div>
   )
