@@ -266,78 +266,80 @@ export default function ScoreEntry() {
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label>Wicket</Label>
-                  <RadioGroup value={isWicket ? "yes" : "no"} onValueChange={(value) => setIsWicket(value === "yes")}>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="yes" id="wicket-yes" className="peer sr-only" />
-                      <Label
-                        htmlFor="wicket-yes"
-                        className="flex h-12 w-full cursor-pointer items-center justify-center rounded-md border-2 border-[#E5E5E5] bg-white text-sm font-medium peer-data-[state=checked]:border-red-500 peer-data-[state=checked]:bg-red-500 peer-data-[state=checked]:text-white [&:has([data-state=checked])]:border-red-500"
-                      >
-                        Wicket
-                      </Label>
-                    </div>
-                  </RadioGroup>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className={`h-12 w-full border-2 ${
+                      isWicket
+                        ? "border-red-500 bg-red-500 text-white hover:bg-red-600 hover:text-white"
+                        : "border-[#E5E5E5] bg-white text-[#1A1A1A] hover:bg-[#F5F5F5]"
+                    }`}
+                    onClick={() => setIsWicket(!isWicket)}
+                  >
+                    Wicket
+                  </Button>
                 </div>
 
                 <div className="space-y-2">
                   <Label>Extra</Label>
-                  <RadioGroup value={isExtra ? "yes" : "no"} onValueChange={(value) => setIsExtra(value === "yes")}>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="yes" id="extra-yes" className="peer sr-only" />
-                      <Label
-                        htmlFor="extra-yes"
-                        className="flex h-12 w-full cursor-pointer items-center justify-center rounded-md border-2 border-[#E5E5E5] bg-white text-sm font-medium peer-data-[state=checked]:border-yellow-500 peer-data-[state=checked]:bg-yellow-500 peer-data-[state=checked]:text-white [&:has([data-state=checked])]:border-yellow-500"
-                      >
-                        Extra
-                      </Label>
-                    </div>
-                  </RadioGroup>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className={`h-12 w-full border-2 ${
+                      isExtra
+                        ? "border-yellow-500 bg-yellow-500 text-white hover:bg-yellow-600 hover:text-white"
+                        : "border-[#E5E5E5] bg-white text-[#1A1A1A] hover:bg-[#F5F5F5]"
+                    }`}
+                    onClick={() => setIsExtra(!isExtra)}
+                  >
+                    Extra
+                  </Button>
                 </div>
               </div>
 
               {isExtra && (
                 <div className="space-y-2">
                   <Label>Extra Type</Label>
-                  <RadioGroup value={extraType} onValueChange={setExtraType} className="grid grid-cols-4 gap-2">
+                  <div className="grid grid-cols-4 gap-2">
                     {["Wide", "No Ball", "Bye", "Leg Bye"].map((type) => (
-                      <div key={type} className="flex items-center space-x-2">
-                        <RadioGroupItem
-                          value={type.toLowerCase()}
-                          id={`extra-${type}`}
-                          className="peer sr-only"
-                        />
-                        <Label
-                          htmlFor={`extra-${type}`}
-                          className="flex h-12 w-full cursor-pointer items-center justify-center rounded-md border-2 border-[#E5E5E5] bg-white text-sm font-medium peer-data-[state=checked]:border-yellow-500 peer-data-[state=checked]:bg-yellow-500 peer-data-[state=checked]:text-white [&:has([data-state=checked])]:border-yellow-500"
-                        >
-                          {type}
-                        </Label>
-                      </div>
+                      <Button
+                        key={type}
+                        type="button"
+                        variant="outline"
+                        className={`h-12 w-full border-2 ${
+                          extraType === type.toLowerCase()
+                            ? "border-yellow-500 bg-yellow-500 text-white hover:bg-yellow-600 hover:text-white"
+                            : "border-[#E5E5E5] bg-white text-[#1A1A1A] hover:bg-[#F5F5F5]"
+                        }`}
+                        onClick={() => setExtraType(extraType === type.toLowerCase() ? "" : type.toLowerCase())}
+                      >
+                        {type}
+                      </Button>
                     ))}
-                  </RadioGroup>
+                  </div>
                 </div>
               )}
 
               {isWicket && (
                 <div className="space-y-2">
                   <Label>Dismissal Type</Label>
-                  <RadioGroup value={dismissalType} onValueChange={setDismissalType} className="grid grid-cols-4 gap-2">
+                  <div className="grid grid-cols-4 gap-2">
                     {["Bowled", "Caught", "LBW", "Run Out"].map((type) => (
-                      <div key={type} className="flex items-center space-x-2">
-                        <RadioGroupItem
-                          value={type.toLowerCase()}
-                          id={`dismissal-${type}`}
-                          className="peer sr-only"
-                        />
-                        <Label
-                          htmlFor={`dismissal-${type}`}
-                          className="flex h-12 w-full cursor-pointer items-center justify-center rounded-md border-2 border-[#E5E5E5] bg-white text-sm font-medium peer-data-[state=checked]:border-red-500 peer-data-[state=checked]:bg-red-500 peer-data-[state=checked]:text-white [&:has([data-state=checked])]:border-red-500"
-                        >
-                          {type}
-                        </Label>
-                      </div>
+                      <Button
+                        key={type}
+                        type="button"
+                        variant="outline"
+                        className={`h-12 w-full border-2 ${
+                          dismissalType === type.toLowerCase()
+                            ? "border-red-500 bg-red-500 text-white hover:bg-red-600 hover:text-white"
+                            : "border-[#E5E5E5] bg-white text-[#1A1A1A] hover:bg-[#F5F5F5]"
+                        }`}
+                        onClick={() => setDismissalType(dismissalType === type.toLowerCase() ? "" : type.toLowerCase())}
+                      >
+                        {type}
+                      </Button>
                     ))}
-                  </RadioGroup>
+                  </div>
                 </div>
               )}
 
