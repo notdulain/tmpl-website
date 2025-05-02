@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   description: 'Official website for TMPL 2.0 - Toastmasters Cricket Tournament',
   icons: {
     icon: '/tm_white.png',
-    apple: '/tm_whote.png',
+    apple: '/tm_white.png',
   },
 }
 
