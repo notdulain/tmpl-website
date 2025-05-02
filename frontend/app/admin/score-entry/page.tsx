@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Textarea } from "@/components/ui/textarea"
-import { ArrowLeft, Save, Undo2, Plus, Minus } from "lucide-react"
+import { ArrowLeft, Save, Undo2, Plus, Minus, ArrowLeftRight } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 export default function ScoreEntry() {
@@ -162,19 +162,29 @@ export default function ScoreEntry() {
                 <div className="flex items-center gap-2">
                   <Input
                     type="number"
-                    min="0"
-                    max="3"
+                    min="1"
+                    max="4"
                     value={over}
-                    onChange={(e) => setOver(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      const value = parseInt(e.target.value);
+                      if (value >= 1 && value <= 4) {
+                        setOver(value.toString());
+                      }
+                    }}
                     className="w-20 bg-white border-[#E5E5E5]"
                   />
                   <span className="text-lg font-medium">.</span>
                   <Input
                     type="number"
-                    min="0"
-                    max="3"
+                    min="1"
+                    max="4"
                     value={ball}
-                    onChange={(e) => setBall(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      const value = parseInt(e.target.value);
+                      if (value >= 1 && value <= 4) {
+                        setBall(value.toString());
+                      }
+                    }}
                     className="w-20 bg-white border-[#E5E5E5]"
                   />
                 </div>
@@ -202,6 +212,21 @@ export default function ScoreEntry() {
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+              <div className="flex items-end justify-center pb-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className="h-10 w-10 border-[#E5E5E5] hover:bg-[#F5F5F5]"
+                  onClick={() => {
+                    const temp = striker;
+                    setStriker(nonStriker);
+                    setNonStriker(temp);
+                  }}
+                >
+                  <ArrowLeftRight className="h-4 w-4" />
+                </Button>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="nonStriker">Non-Striker</Label>

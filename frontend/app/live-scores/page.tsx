@@ -203,11 +203,6 @@ export default function LiveScores() {
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="font-medium text-sm md:text-base">{batsman.name}</span>
-                      {batsman.isGirl && (
-                        <Badge variant="outline" className="text-xs md:text-sm border-[#800000] text-[#800000]">
-                          Girl
-                        </Badge>
-                      )}
                       {batsman.isStriker && (
                         <Badge variant="outline" className="text-xs md:text-sm border-[#800000] text-[#800000]">
                           Striker
@@ -233,11 +228,6 @@ export default function LiveScores() {
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="font-medium text-sm md:text-base">{liveMatch.currentBowler.name}</span>
-                    {liveMatch.currentBowler.isGirl && (
-                      <Badge variant="outline" className="text-xs md:text-sm border-[#800000] text-[#800000]">
-                        Girl
-                      </Badge>
-                    )}
                   </div>
                   <div className="text-xs md:text-sm text-[#666666]">{liveMatch.currentBowler.maidens} maidens</div>
                 </div>
