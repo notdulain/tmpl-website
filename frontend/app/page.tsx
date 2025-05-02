@@ -1,9 +1,14 @@
+"use client"
+
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { Trophy, Users, Calendar, ExternalLink } from "lucide-react"
+import { Trophy, Users, Calendar, ExternalLink, Menu, X } from "lucide-react"
+import { useState } from "react"
 
 export default function Home() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+
   return (
     <div className="min-h-screen bg-light-white text-charcoal-500">
       {/* Header */}
@@ -32,33 +37,77 @@ export default function Home() {
               Organizers
             </Link>
           </nav>
-          <Button
-            variant="outline"
-            className="hidden md:flex border-maroon-500 text-maroon-500 hover:bg-maroon-500 hover:text-light-white"
-          >
-            <Link href="/admin">Admin</Link>
-          </Button>
-          <Button variant="ghost" size="icon" className="md:hidden text-charcoal-500">
-            <span className="sr-only">Open menu</span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="h-6 w-6"
+          <div className="flex items-center gap-4">
+            <Button
+              variant="outline"
+              className="hidden md:flex border-maroon-500 text-maroon-500 hover:bg-maroon-500 hover:text-light-white"
             >
-              <line x1="4" x2="20" y1="12" y2="12" />
-              <line x1="4" x2="20" y1="6" y2="6" />
-              <line x1="4" x2="20" y1="18" y2="18" />
-            </svg>
-          </Button>
+              <Link href="/admin">Admin</Link>
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="md:hidden text-charcoal-500"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </Button>
+          </div>
         </div>
       </header>
+
+      {/* Mobile Menu */}
+      <div className={`fixed inset-0 bg-black/50 z-50 transition-opacity duration-300 md:hidden ${isMobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+        <div className={`fixed right-0 top-0 h-full w-64 bg-light-white shadow-lg transform transition-transform duration-300 ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+          <div className="p-6">
+            <div className="flex justify-end mb-8">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <X className="h-6 w-6" />
+              </Button>
+            </div>
+            <nav className="flex flex-col gap-6">
+              <Link 
+                href="/" 
+                className="text-charcoal-500 hover:text-maroon-500 transition-colors text-lg"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Home
+              </Link>
+              <Link 
+                href="/live-scores" 
+                className="text-charcoal-500 hover:text-maroon-500 transition-colors text-lg"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Live Scores
+              </Link>
+              <Link 
+                href="#about" 
+                className="text-charcoal-500 hover:text-maroon-500 transition-colors text-lg"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                About
+              </Link>
+              <Link 
+                href="#organizers" 
+                className="text-charcoal-500 hover:text-maroon-500 transition-colors text-lg"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Organizers
+              </Link>
+              <Button
+                variant="outline"
+                className="border-maroon-500 text-maroon-500 hover:bg-maroon-500 hover:text-light-white mt-4"
+              >
+                <Link href="/admin">Admin</Link>
+              </Button>
+            </nav>
+          </div>
+        </div>
+      </div>
 
       {/* Hero Section */}
       <section className="relative py-10 overflow-hidden bg-light-grey">
@@ -106,7 +155,7 @@ export default function Home() {
             </h2>
             <p className="text-charcoal-300 text-lg leading-relaxed">
               TMPL 2.0 is the second edition of the Toastmasters Premier League, a friendly cricket tournament that
-              brings together Toastmasters from across Division J. The tournament aims to foster camaraderie, teamwork,
+              brings together Toastmasters from across the District 82. The tournament aims to foster camaraderie, teamwork,
               and leadership skills through the spirit of cricket.
             </p>
           </div>
@@ -149,35 +198,35 @@ export default function Home() {
             <span className="text-maroon-500">Organized</span> By
           </h2>
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <div className="bg-light-white rounded-lg p-6 flex flex-col items-center shadow-sm">
-              <div className="w-24 h-24 rounded-full overflow-hidden mb-4">
+            <div className="bg-gradient-to-br from-[#a9b2b1] to-[#b6bebd] rounded-2xl p-6 flex flex-col items-center shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.16)] transition-shadow">
+              <div className="w-24 h-24 rounded-full overflow-hidden mb-4 ring-2 ring-white/20">
                 <Image
-                  src="/placeholder.svg?height=200&width=200"
+                  src="/divJDP.jpeg"
                   alt="Division J"
                   width={96}
                   height={96}
                   className="object-cover"
                 />
               </div>
-              <h3 className="text-xl font-bold mb-1 text-charcoal-500">Division J</h3>
-              <p className="text-charcoal-300 text-center">Toastmasters International</p>
-              <p className="mt-4 text-charcoal-300 text-center">
+              <h3 className="text-xl font-bold mb-1 text-white">Division J</h3>
+              <p className="text-white/80 text-center">Toastmasters International</p>
+              <p className="mt-4 text-white/80 text-center">
                 Proudly organizing the tournament to promote leadership and communication skills through sports.
               </p>
             </div>
-            <div className="bg-light-white rounded-lg p-6 flex flex-col items-center shadow-sm">
-              <div className="w-24 h-24 rounded-full overflow-hidden mb-4">
+            <div className="bg-gradient-to-br from-[#a9b2b1] to-[#b6bebd] rounded-2xl p-6 flex flex-col items-center shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.16)] transition-shadow">
+              <div className="w-24 h-24 rounded-full overflow-hidden mb-4 ring-2 ring-white/20">
                 <Image
-                  src="/placeholder.svg?height=200&width=200"
+                  src="/CLTC_DP.jpg"
                   alt="Central Link Toastmasters"
                   width={96}
                   height={96}
                   className="object-cover"
                 />
               </div>
-              <h3 className="text-xl font-bold mb-1 text-charcoal-500">Central Link Toastmasters</h3>
-              <p className="text-charcoal-300 text-center">Host Club</p>
-              <p className="mt-4 text-charcoal-300 text-center">
+              <h3 className="text-xl font-bold mb-1 text-white">Central Link Toastmasters</h3>
+              <p className="text-white/80 text-center">Host Club</p>
+              <p className="mt-4 text-white/80 text-center">
                 Hosting and facilitating the tournament with enthusiasm and dedication.
               </p>
             </div>
