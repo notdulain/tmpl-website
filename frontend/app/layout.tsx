@@ -9,11 +9,11 @@ const poppins = Poppins({
 })
 
 export const metadata: Metadata = {
-  title: 'TMPL 2.0 - Toastmasters Cricket Tournament',
+  title: 'TMPL 2.0 - Toastmasters Premier League',
   description: 'Official website for TMPL 2.0 - Toastmasters Cricket Tournament',
   icons: {
-    icon: '/TMPL_Logo.png',
-    apple: '/TMPL_Logo.png',
+    icon: '/tm_white.png',
+    apple: '/tm_whote.png',
   },
 }
 
