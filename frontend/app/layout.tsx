@@ -9,9 +9,12 @@ const poppins = Poppins({
 })
 
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
-  generator: 'v0.dev',
+  title: 'TMPL 2.0 - Toastmasters Cricket Tournament',
+  description: 'Official website for TMPL 2.0 - Toastmasters Cricket Tournament',
+  icons: {
+    icon: '/TMPL_Logo.png',
+    apple: '/TMPL_Logo.png',
+  },
 }
 
 export default function RootLayout({
