@@ -110,34 +110,33 @@ export default function Home() {
       </div>
 
       {/* Hero Section */}
-      <section className="relative py-10 overflow-hidden bg-light-grey">
-        <div className="container relative z-20 mx-auto px-4 py-6 md:py-12">
-          <div className="flex flex-col items-center text-center space-y-8">
+      <section className="relative py-16 md:py-24 overflow-hidden bg-light-grey">
+        <div className="container relative z-20 mx-auto px-4">
+          <div className="flex flex-col items-center text-center space-y-6">
             <Image
-              src="/TMPL_Logo_Maroon.png"
+              src="/wordmark.png"
               alt="TMPL Logo"
-              width={800}
-              height={800}
+              width={1000}
+              height={1000}
               className="rounded-full"
             />
-            <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight">
-              <span className="text-maroon-500">TMPL 2.0</span>
-              <span className="block text-charcoal-500">Toastmasters Premier League</span>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-charcoal-500">
+              TMPL 2.0
             </h1>
-            <p className="text-xl md:text-2xl text-charcoal-300 max-w-2xl">
+            <p className="text-lg md:text-xl text-charcoal-300 max-w-2xl leading-relaxed">
               A friendly cricket tournament organized by Division J and hosted by Central Link Toastmasters
             </p>
-            <div className="flex items-center gap-2 text-charcoal-400">
-              <Calendar className="h-5 w-5" />
+            <div className="flex items-center gap-2 text-charcoal-400 text-sm md:text-base">
+              <Calendar className="h-4 w-4 md:h-5 md:w-5" />
               <span className="font-medium">May 10, 2025</span>
             </div>
-            <div className="flex flex-col sm:flex-row gap-4 mt-8">
-              <Button className="bg-maroon-500 hover:bg-maroon-600 text-light-white px-8 py-6 text-lg rounded-lg">
+            <div className="flex flex-col sm:flex-row gap-4 mt-4">
+              <Button className="bg-maroon-500 hover:bg-maroon-600 text-light-white px-6 py-5 text-base md:text-lg rounded-lg">
                 <Link href="/live-scores">View Live Scores</Link>
               </Button>
               <Button
                 variant="outline"
-                className="border-maroon-500 text-maroon-500 hover:bg-maroon-500 hover:text-light-white px-8 py-6 text-lg rounded-lg"
+                className="border-maroon-500 text-maroon-500 hover:bg-maroon-500 hover:text-light-white px-6 py-5 text-base md:text-lg rounded-lg"
               >
                 <Link href="#teams">Team Profiles</Link>
               </Button>
@@ -150,9 +149,15 @@ export default function Home() {
       <section id="about" className="py-16 bg-light-white">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              About <span className="text-maroon-500">TMPL 2.0</span>
-            </h2>
+            <div className="flex justify-center mb-6">
+              <Image
+                src="/TMPL_Logo_Maroon.png"
+                alt="TMPL Logo"
+                width={500}
+                height={500}
+                className="rounded-full"
+              />
+            </div>
             <p className="text-charcoal-300 text-lg leading-relaxed">
               TMPL 2.0 is the second edition of the Toastmasters Premier League, a friendly cricket tournament that
               brings together Toastmasters from across the District 82. The tournament aims to foster camaraderie, teamwork,

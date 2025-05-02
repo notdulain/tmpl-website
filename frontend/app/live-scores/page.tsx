@@ -84,74 +84,73 @@ export default function LiveScores() {
     <div className="min-h-screen bg-[#FAF8F5] text-[#1A1A1A]">
       {/* Header */}
       <header className="bg-white border-b border-[#E5E5E5] sticky top-0 z-50">
-        <div className="px-4 py-3 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
+        <div className="px-4 md:px-8 py-3 flex items-center justify-between max-w-7xl mx-auto">
+          <Link href="/" className="flex items-center">
             <Image
               src="/TMPL_Logo_Maroon.png"
               alt="TMPL Logo"
-              width={32}
-              height={32}
-              className="rounded-full"
+              width={150}
+              height={150}
+              className="rounded-ful"
             />
-            <span className="font-bold text-lg text-[#800000]">TMPL 2.0</span>
           </Link>
           <Button 
             variant="outline" 
             size="sm" 
-            className="gap-2 border-[#800000] text-[#800000] hover:bg-[#800000] hover:text-white"
+            className="gap-2 border-[#800000] text-[#800000] hover:bg-[#800000] hover:text-white text-sm md:text-base"
             onClick={handleRefresh}
             disabled={isRefreshing}
           >
-            <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`h-4 w-4 md:h-5 md:w-5 ${isRefreshing ? 'animate-spin' : ''}`} />
             Refresh
           </Button>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="px-4 py-4 space-y-4">
+      <main className="px-4 md:px-8 py-4 space-y-4 max-w-7xl mx-auto">
         {/* Back Button */}
-        <Button variant="ghost" size="sm" className="w-full justify-start gap-2 text-[#800000]" asChild>
+        <Button variant="ghost" size="sm" className="w-full justify-start gap-2 text-[#800000] text-sm md:text-base" asChild>
           <Link href="/">
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="h-4 w-4 md:h-5 md:w-5" />
             Back to Home
           </Link>
         </Button>
 
         {/* Live Match Card */}
         <Card className="bg-white border-[#E5E5E5] shadow-sm">
-          <CardContent className="p-4 space-y-4">
+          <CardContent className="p-4 md:p-6 space-y-4 md:space-y-6">
             {/* Match Header */}
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <Badge className="bg-[#800000] text-white">LIVE</Badge>
-                  <Badge variant="outline" className="border-[#800000] text-[#800000]">
+                  <Badge className="bg-[#800000] text-white text-xs md:text-sm">LIVE</Badge>
+                  <Badge variant="outline" className="border-[#800000] text-[#800000] text-xs md:text-sm">
                     {liveMatch.stage}
                   </Badge>
                 </div>
-                <h1 className="text-lg font-bold">
+                <h1 className="text-lg md:text-2xl font-bold">
                   {liveMatch.team1.name} vs {liveMatch.team2.name}
                 </h1>
               </div>
-              <Badge variant="outline" className="text-[#800000] border-[#800000]">
-                <Clock className="h-3 w-3 mr-1" />
+              <Badge variant="outline" className="text-[#800000] border-[#800000] text-xs md:text-sm">
+                <Clock className="h-3 w-3 md:h-4 md:w-4 mr-1" />
                 In Progress
               </Badge>
             </div>
 
             {/* Score Display */}
-            <div className="bg-[#F5F5F5] rounded-lg p-4">
+            <div className="bg-[#F5F5F5] rounded-lg p-4 md:p-6">
               <div className="flex justify-between items-center">
                 <div>
-                  <div className="text-sm text-[#666666]">Batting</div>
-                  <div className="text-2xl font-bold text-[#800000]">
+                  <div className="text-sm md:text-base text-[#666666]">Batting</div>
+                  <div className="text-2xl md:text-4xl font-bold text-[#800000]">
                     {liveMatch.team1.runs}/{liveMatch.team1.wickets}
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-sm text-[#666666]">Overs</div>
-                  <div className="text-lg font-medium">
+                  <div className="text-sm md:text-base text-[#666666]">Overs</div>
+                  <div className="text-lg md:text-2xl font-medium">
                     {liveMatch.team1.overs}/4.0
                   </div>
                 </div>
@@ -160,30 +159,30 @@ export default function LiveScores() {
 
             {/* Current Batsmen */}
             <div className="space-y-3">
-              <h2 className="text-sm font-medium text-[#666666]">Current Batsmen</h2>
+              <h2 className="text-sm md:text-base font-medium text-[#666666]">Current Batsmen</h2>
               {liveMatch.currentBatsmen.map((batsman, index) => (
-                <div key={index} className="flex justify-between items-center bg-[#F5F5F5] rounded-lg p-3">
+                <div key={index} className="flex justify-between items-center bg-[#F5F5F5] rounded-lg p-3 md:p-4">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-medium">{batsman.name}</span>
+                      <span className="font-medium text-sm md:text-base">{batsman.name}</span>
                       {batsman.isGirl && (
-                        <Badge variant="outline" className="text-xs border-[#800000] text-[#800000]">
+                        <Badge variant="outline" className="text-xs md:text-sm border-[#800000] text-[#800000]">
                           Girl
                         </Badge>
                       )}
                       {batsman.isStriker && (
-                        <Badge variant="outline" className="text-xs border-[#800000] text-[#800000]">
+                        <Badge variant="outline" className="text-xs md:text-sm border-[#800000] text-[#800000]">
                           Striker
                         </Badge>
                       )}
                     </div>
-                    <div className="text-xs text-[#666666]">
+                    <div className="text-xs md:text-sm text-[#666666]">
                       {batsman.fours} fours, {batsman.sixes} sixes
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="font-bold text-[#800000]">{batsman.runs}</div>
-                    <div className="text-xs text-[#666666]">{batsman.balls} balls</div>
+                    <div className="font-bold text-[#800000] text-sm md:text-base">{batsman.runs}</div>
+                    <div className="text-xs md:text-sm text-[#666666]">{batsman.balls} balls</div>
                   </div>
                 </div>
               ))}
@@ -191,36 +190,36 @@ export default function LiveScores() {
 
             {/* Current Bowler */}
             <div className="space-y-2">
-              <h2 className="text-sm font-medium text-[#666666]">Current Bowler</h2>
-              <div className="flex justify-between items-center bg-[#F5F5F5] rounded-lg p-3">
+              <h2 className="text-sm md:text-base font-medium text-[#666666]">Current Bowler</h2>
+              <div className="flex justify-between items-center bg-[#F5F5F5] rounded-lg p-3 md:p-4">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-medium">{liveMatch.currentBowler.name}</span>
+                    <span className="font-medium text-sm md:text-base">{liveMatch.currentBowler.name}</span>
                     {liveMatch.currentBowler.isGirl && (
-                      <Badge variant="outline" className="text-xs border-[#800000] text-[#800000]">
+                      <Badge variant="outline" className="text-xs md:text-sm border-[#800000] text-[#800000]">
                         Girl
                       </Badge>
                     )}
                   </div>
-                  <div className="text-xs text-[#666666]">{liveMatch.currentBowler.maidens} maidens</div>
+                  <div className="text-xs md:text-sm text-[#666666]">{liveMatch.currentBowler.maidens} maidens</div>
                 </div>
                 <div className="text-right">
-                  <div className="font-bold text-[#800000]">
+                  <div className="font-bold text-[#800000] text-sm md:text-base">
                     {liveMatch.currentBowler.wickets}/{liveMatch.currentBowler.runs}
                   </div>
-                  <div className="text-xs text-[#666666]">{liveMatch.currentBowler.overs} overs</div>
+                  <div className="text-xs md:text-sm text-[#666666]">{liveMatch.currentBowler.overs} overs</div>
                 </div>
               </div>
             </div>
 
             {/* Recent Deliveries */}
             <div className="space-y-2">
-              <h2 className="text-sm font-medium text-[#666666]">Recent Deliveries</h2>
+              <h2 className="text-sm md:text-base font-medium text-[#666666]">Recent Deliveries</h2>
               <div className="flex gap-2 overflow-x-auto pb-2">
                 {liveMatch.recentDeliveries.map((ball, index) => (
                   <div
                     key={index}
-                    className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium ${
+                    className={`flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-sm md:text-base font-medium ${
                       ball === "W"
                         ? "bg-[#800000]/10 text-[#800000]"
                         : ball === "4" || ball === "6"
@@ -238,23 +237,23 @@ export default function LiveScores() {
 
             {/* Extras */}
             <div className="space-y-2">
-              <h2 className="text-sm font-medium text-[#666666]">Extras</h2>
-              <div className="grid grid-cols-4 gap-2 bg-[#F5F5F5] rounded-lg p-3">
+              <h2 className="text-sm md:text-base font-medium text-[#666666]">Extras</h2>
+              <div className="grid grid-cols-4 gap-2 bg-[#F5F5F5] rounded-lg p-3 md:p-4">
                 <div className="text-center">
-                  <div className="text-xs text-[#666666]">Wides</div>
-                  <div className="font-medium">{liveMatch.team1.extras.wides}</div>
+                  <div className="text-xs md:text-sm text-[#666666]">Wides</div>
+                  <div className="font-medium text-sm md:text-base">{liveMatch.team1.extras.wides}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-xs text-[#666666]">No Balls</div>
-                  <div className="font-medium">{liveMatch.team1.extras.noBalls}</div>
+                  <div className="text-xs md:text-sm text-[#666666]">No Balls</div>
+                  <div className="font-medium text-sm md:text-base">{liveMatch.team1.extras.noBalls}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-xs text-[#666666]">Byes</div>
-                  <div className="font-medium">{liveMatch.team1.extras.byes}</div>
+                  <div className="text-xs md:text-sm text-[#666666]">Byes</div>
+                  <div className="font-medium text-sm md:text-base">{liveMatch.team1.extras.byes}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-xs text-[#666666]">Leg Byes</div>
-                  <div className="font-medium">{liveMatch.team1.extras.legByes}</div>
+                  <div className="text-xs md:text-sm text-[#666666]">Leg Byes</div>
+                  <div className="font-medium text-sm md:text-base">{liveMatch.team1.extras.legByes}</div>
                 </div>
               </div>
             </div>
