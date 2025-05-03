@@ -1,45 +1,70 @@
-"use client"
+"use client";
 
-import { useState, FormEvent } from "react"
-import { useRouter } from "next/navigation"
-import Link from "next/link"
-import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { ArrowLeft, Lock } from "lucide-react"
+import { useState, FormEvent } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { ArrowLeft, Lock } from "lucide-react";
+
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { app } from "@/lib/firebase";
 
 export default function AdminLogin() {
-  const router = useRouter()
-  const [username, setUsername] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const auth = getAuth(app);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setError("")
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
 
     // Simple mock authentication - in a real app, this would be a server request
     setTimeout(() => {
       // For demo purposes, accept any non-empty username/password
       if (username.trim() && password.trim()) {
-        router.push("/admin/score-entry")
+        //Firebase authentication
+        signInWithEmailAndPassword(auth, username, password)
+          .then((userCredential) => {
+            // Signed in
+            const user = userCredential.user;
+            console.log(user);
+            router.push("/admin/score-entry");
+            // ...
+          })
+          .catch((error) => {
+            setError(error.message);
+            const errorCode = error.code;
+            const errorMessage = error.message;
+          });
       } else {
-        setError("Invalid username or password")
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }, 1000)
-  }
+    }, 1000);
+  };
 
   return (
     <div className="min-h-screen bg-[#FAF8F5] flex items-center justify-center p-4">
       <Card className="w-full max-w-md bg-white border-[#E5E5E5] shadow-sm">
         <CardHeader className="space-y-4 text-center">
           <div>
-            <CardTitle className="text-2xl font-bold text-charcoal-500">Admin Login</CardTitle>
+            <CardTitle className="text-2xl font-bold text-charcoal-500">
+              Admin Login
+            </CardTitle>
             <CardDescription className="text-charcoal-300 mt-2">
               Enter your credentials to access the score entry system
             </CardDescription>
@@ -47,9 +72,15 @@ export default function AdminLogin() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            {error && <div className="bg-maroon-500/10 text-maroon-500 px-4 py-2 rounded-md text-sm text-center">{error}</div>}
+            {error && (
+              <div className="bg-maroon-500/10 text-maroon-500 px-4 py-2 rounded-md text-sm text-center">
+                {error}
+              </div>
+            )}
             <div className="space-y-2">
-              <Label htmlFor="username" className="text-charcoal-500">Username</Label>
+              <Label htmlFor="username" className="text-charcoal-500">
+                Username
+              </Label>
               <Input
                 id="username"
                 placeholder="Enter your username"
@@ -60,7 +91,9 @@ export default function AdminLogin() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-charcoal-500">Password</Label>
+              <Label htmlFor="password" className="text-charcoal-500">
+                Password
+              </Label>
               <Input
                 id="password"
                 type="password"
@@ -72,7 +105,11 @@ export default function AdminLogin() {
               />
             </div>
             <div className="pt-2">
-              <Button type="submit" className="w-full bg-maroon-500 hover:bg-maroon-600 text-light-white" disabled={isLoading}>
+              <Button
+                type="submit"
+                className="w-full bg-maroon-500 hover:bg-maroon-600 text-light-white"
+                disabled={isLoading}
+              >
                 {isLoading ? (
                   <div className="flex items-center justify-center gap-2">
                     <svg
@@ -106,7 +143,12 @@ export default function AdminLogin() {
               </Button>
             </div>
             <div className="text-center">
-              <Button variant="ghost" size="sm" asChild className="text-charcoal-300 hover:text-maroon-500">
+              <Button
+                variant="ghost"
+                size="sm"
+                asChild
+                className="text-charcoal-300 hover:text-maroon-500"
+              >
                 <Link href="/">
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back to Home
@@ -117,5 +159,5 @@ export default function AdminLogin() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
