@@ -49,21 +49,6 @@ interface MathcProps {
   tossDecisiton: String;
 }
 
-interface BatsmanProps {
-  runs: Number;
-  balls: Number;
-  sixes: Number;
-  fours: Number;
-}
-
-interface Deliveries {
-  delivery: String;
-}
-interface PlayerDetailProp {
-  id: Number;
-  name: String;
-}
-
 export default function ScoreEntry() {
   const router = useRouter();
   const auth = getAuth(app);
@@ -174,13 +159,17 @@ export default function ScoreEntry() {
     };
     if (matches) {
       fetchData();
+      setStriker("");
+      setNonStriker("");
+      setBattingTeam("");
+      setBattingTeam("");
     }
   }, [selectedMatch]);
 
   const [inning, setInning] = useState("1");
   const [over, setOver] = useState("0");
   const [ball, setBall] = useState("0");
-  const [striker, setStriker] = useState<Number>();
+  const [striker, setStriker] = useState("");
   const [nonStriker, setNonStriker] = useState("");
   const [bowler, setBowler] = useState("");
   const [runs, setRuns] = useState("0");
@@ -189,6 +178,7 @@ export default function ScoreEntry() {
   const [extraType, setExtraType] = useState("");
   const [dismissalType, setDismissalType] = useState("");
   const [comment, setComment] = useState("");
+  const [battingTeam, setBattingTeam] = useState("");
 
   // Current score state
   const [currentScore, setCurrentScore] = useState({
@@ -206,33 +196,27 @@ export default function ScoreEntry() {
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const strickerData: BatsmanProps = {
-      runs: 10,
-      balls: 20,
-      sixes: 1,
-      fours: 1,
-    };
-    const ref1 = ref(db, `${selectedMatch}/${striker}`);
-    set(ref1, strickerData);
+    // const ref1 = ref(db, `${selectedMatch}/${striker}`);
+    // set(ref1, strickerData);
 
-    // const nonStrickerData: BatsmanProps = {
-    //   runs: 10,
-    //   balls: 20,
-    //   sixes: 1,
-    //   fours: 1,
-    // };
-    // const ref2 = ref(db, `${selectedMatch}/${nonStriker}`);
-    // set(ref2, nonStrickerData);
+    // // const nonStrickerData: BatsmanProps = {
+    // //   runs: 10,
+    // //   balls: 20,
+    // //   sixes: 1,
+    // //   fours: 1,
+    // // };
+    // // const ref2 = ref(db, `${selectedMatch}/${nonStriker}`);
+    // // set(ref2, nonStrickerData);
 
-    // Here you would handle the submission to update the score
-    alert("Ball submitted successfully!");
-    // Reset form fields
-    setRuns("0");
-    setIsWicket(false);
-    setIsExtra(false);
-    setExtraType("");
-    setDismissalType("");
-    setComment("");
+    // // Here you would handle the submission to update the score
+    // alert("Ball submitted successfully!");
+    // // Reset form fields
+    // setRuns("0");
+    // setIsWicket(false);
+    // setIsExtra(false);
+    // setExtraType("");
+    // setDismissalType("");
+    // setComment("");
   };
 
   const handleUndo = () => {
@@ -361,9 +345,33 @@ export default function ScoreEntry() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="grid grid-cols-3 gap-6">
+                <div className="col-span-3 w-full space-y-2">
+                  <Label htmlFor="bowler">Select Batting Team</Label>
+                  <Select value={battingTeam} onValueChange={setBattingTeam}>
+                    <SelectTrigger
+                      id="battingTeam"
+                      className="bg-white border-[#E5E5E5]"
+                    >
+                      <SelectValue placeholder="Select Batting Team" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {matches && selectedMatch && (
+                        <>
+                          <SelectItem key="team1" value="team1">
+                            {matches[selectedMatch].team1}
+                          </SelectItem>
+                          <SelectItem key="team2" value="team2">
+                            {matches[selectedMatch].team2}
+                          </SelectItem>
+                        </>
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+
                 <div className="space-y-2">
                   <Label htmlFor="striker">Striker</Label>
-                  {/* <Select value={striker} onValueChange={setStriker}>
+                  <Select value={striker} onValueChange={setStriker}>
                     <SelectTrigger
                       id="striker"
                       className="bg-white border-[#E5E5E5]"
@@ -371,16 +379,25 @@ export default function ScoreEntry() {
                       <SelectValue placeholder="Select striker" />
                     </SelectTrigger>
                     <SelectContent>
-                      {teams["Dynamic Dragons"].players.map((player) => (
-                        <SelectItem
-                          key={player.id}
-                          value={player.id.toString()}
-                        >
-                          {player.name}
-                        </SelectItem>
-                      ))}
+                      {battingTeam && battingTeam == "team1"
+                        ? team1 &&
+                          Object.entries(team1)
+                            .filter(([key]) => key.startsWith("member"))
+                            .map(([key, value]) => (
+                              <SelectItem key={key} value={key}>
+                                {value as string}
+                              </SelectItem>
+                            ))
+                        : team2 &&
+                          Object.entries(team2)
+                            .filter(([key]) => key.startsWith("member"))
+                            .map(([key, value]) => (
+                              <SelectItem key={key} value={key}>
+                                {value as string}
+                              </SelectItem>
+                            ))}
                     </SelectContent>
-                  </Select> */}
+                  </Select>
                 </div>
                 <div className="flex items-end justify-center pb-2">
                   <Button
@@ -399,7 +416,7 @@ export default function ScoreEntry() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="nonStriker">Non-Striker</Label>
-                  {/* <Select value={nonStriker} onValueChange={setNonStriker}>
+                  <Select value={nonStriker} onValueChange={setNonStriker}>
                     <SelectTrigger
                       id="nonStriker"
                       className="bg-white border-[#E5E5E5]"
@@ -407,17 +424,29 @@ export default function ScoreEntry() {
                       <SelectValue placeholder="Select non-striker" />
                     </SelectTrigger>
                     <SelectContent>
-                      {teams[matches.find].players.map((player) => (
-                        <SelectItem key={player.id} value={player.name}>
-                          {player.name}
-                        </SelectItem>
-                      ))}
+                      {battingTeam && battingTeam == "team1"
+                        ? team1 &&
+                          Object.entries(team1)
+                            .filter(([key]) => key.startsWith("member"))
+                            .map(([key, value]) => (
+                              <SelectItem key={key} value={key}>
+                                {value as string}
+                              </SelectItem>
+                            ))
+                        : team2 &&
+                          Object.entries(team2)
+                            .filter(([key]) => key.startsWith("member"))
+                            .map(([key, value]) => (
+                              <SelectItem key={key} value={key}>
+                                {value as string}
+                              </SelectItem>
+                            ))}
                     </SelectContent>
-                  </Select> */}
+                  </Select>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="bowler">Bowler</Label>
-                  {/* <Select value={bowler} onValueChange={setBowler}>
+                  <Select value={bowler} onValueChange={setBowler}>
                     <SelectTrigger
                       id="bowler"
                       className="bg-white border-[#E5E5E5]"
@@ -425,13 +454,25 @@ export default function ScoreEntry() {
                       <SelectValue placeholder="Select bowler" />
                     </SelectTrigger>
                     <SelectContent>
-                      {teams["Dynamic Dragons"].players.map((player) => (
-                        <SelectItem key={player.id} value={player.name}>
-                          {player.name}
-                        </SelectItem>
-                      ))}
+                      {battingTeam && battingTeam == "team1"
+                        ? team2 &&
+                          Object.entries(team2)
+                            .filter(([key]) => key.startsWith("member"))
+                            .map(([key, value]) => (
+                              <SelectItem key={key} value={key}>
+                                {value as string}
+                              </SelectItem>
+                            ))
+                        : team1 &&
+                          Object.entries(team1)
+                            .filter(([key]) => key.startsWith("member"))
+                            .map(([key, value]) => (
+                              <SelectItem key={key} value={key}>
+                                {value as string}
+                              </SelectItem>
+                            ))}
                     </SelectContent>
-                  </Select> */}
+                  </Select>
                 </div>
               </CardContent>
             </Card>
