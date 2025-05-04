@@ -49,6 +49,25 @@ interface MathcProps {
   tossDecisiton: String;
 }
 
+interface InningDataProps {
+  battingTeam: string;
+  runs: number;
+  wickets: number;
+  overs: number;
+  stricker: string;
+  batsman1: string;
+  batsman2: string;
+  batsman1Runs: number;
+  batsman1Balls: number;
+  batsman2Runs: number;
+  batsman2Balls: number;
+  bowler: string;
+  wides: number;
+  noBals: number;
+  byes: number;
+  legByes: number;
+}
+
 export default function ScoreEntry() {
   const router = useRouter();
   const auth = getAuth(app);
@@ -61,6 +80,37 @@ export default function ScoreEntry() {
   const [team1, setTeam1] = useState<TeamProps | null>();
   const [team2, setTeam2] = useState<TeamProps | null>();
   const [isLive, setIsLive] = useState(false);
+  const [inning, setInning] = useState("");
+  const [over, setOver] = useState("0");
+  const [ball, setBall] = useState("0");
+  const [striker, setStriker] = useState("");
+  const [nonStriker, setNonStriker] = useState("");
+  const [bowler, setBowler] = useState("");
+  const [runs, setRuns] = useState("0");
+  const [isWicket, setIsWicket] = useState(false);
+  const [isExtra, setIsExtra] = useState(false);
+  const [extraType, setExtraType] = useState("");
+  const [dismissalType, setDismissalType] = useState("");
+  const [comment, setComment] = useState("");
+  const [battingTeam, setBattingTeam] = useState("");
+  const [inningData, setInningData] = useState<InningDataProps>({
+    battingTeam: "",
+    runs: 0,
+    wickets: 0,
+    overs: 0.0,
+    stricker: "",
+    batsman1: "",
+    batsman2: "",
+    batsman1Runs: 0,
+    batsman1Balls: 0,
+    batsman2Runs: 0,
+    batsman2Balls: 0,
+    bowler: "",
+    wides: 0,
+    noBals: 0,
+    byes: 0,
+    legByes: 0,
+  });
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -166,32 +216,93 @@ export default function ScoreEntry() {
     }
   }, [selectedMatch]);
 
-  const [inning, setInning] = useState("1");
-  const [over, setOver] = useState("0");
-  const [ball, setBall] = useState("0");
-  const [striker, setStriker] = useState("");
-  const [nonStriker, setNonStriker] = useState("");
-  const [bowler, setBowler] = useState("");
-  const [runs, setRuns] = useState("0");
-  const [isWicket, setIsWicket] = useState(false);
-  const [isExtra, setIsExtra] = useState(false);
-  const [extraType, setExtraType] = useState("");
-  const [dismissalType, setDismissalType] = useState("");
-  const [comment, setComment] = useState("");
-  const [battingTeam, setBattingTeam] = useState("");
+  useEffect(() => {
+    const fetchData = async () => {
+      if (selectedMatch && inning != "") {
+        const dbRef = ref(db, `matches/${selectedMatch}/innings/${inning}`);
+        const snapshot = await get(dbRef);
+        if (snapshot.exists()) {
+          const data: InningDataProps = snapshot.val();
+          setInningData(data);
+          setBattingTeam(data.battingTeam);
+          const batsman1 = data.batsman1;
+          const batsman2 = data.batsman2;
+          if (batsman1 == data.stricker) {
+            setStriker(batsman1);
+            setNonStriker(batsman2);
+          } else {
+            setStriker(batsman1);
+            setNonStriker(batsman2);
+          }
+          setBowler(data.bowler);
+        } else {
+          set(dbRef, inningData);
+        }
+      }
+    };
+    fetchData();
+  }, [inning]);
 
-  // Current score state
-  const [currentScore, setCurrentScore] = useState({
-    runs: 0,
-    wickets: 0,
-    overs: "0.0",
-    extras: {
-      wides: 0,
-      noBalls: 0,
-      byes: 0,
-      legByes: 0,
-    },
-  });
+  useEffect(() => {
+    if (striker != "") {
+      const i = inningData;
+      i.stricker = striker;
+      if (selectedMatch && inning != "") {
+        const refference = ref(
+          db,
+          `matches/${selectedMatch}/innings/${inning}`
+        );
+        set(refference, i);
+      }
+      setInningData(i);
+    }
+  }, [striker]);
+
+  useEffect(() => {
+    const i = inningData;
+    console.log("hello");
+
+    if (striker != inningData.batsman1 && striker != inningData.batsman2) {
+      console.log("hello");
+
+      if (nonStriker == inningData.batsman1) {
+        i.batsman2 = striker;
+      } else {
+        i.batsman1 = striker;
+      }
+    }
+    if (
+      nonStriker != inningData.batsman1 &&
+      nonStriker != inningData.batsman2
+    ) {
+      console.log("hello");
+
+      if (striker == inningData.batsman1) {
+        i.batsman2 = nonStriker;
+      } else {
+        i.batsman1 = nonStriker;
+      }
+    }
+    if (selectedMatch && inning != "") {
+      const refference = ref(db, `matches/${selectedMatch}/innings/${inning}`);
+      set(refference, i);
+    }
+  }, [striker, nonStriker]);
+
+  useEffect(() => {
+    const i = inningData;
+
+    if (battingTeam != inningData.battingTeam) {
+      if (selectedMatch && inning != "") {
+        const refference = ref(
+          db,
+          `matches/${selectedMatch}/innings/${inning}`
+        );
+        i.battingTeam = battingTeam;
+        set(refference, i);
+      }
+    }
+  }, [battingTeam]);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -253,8 +364,7 @@ export default function ScoreEntry() {
               <div className="text-right">
                 <div className="text-sm text-[#666666]">Current Score</div>
                 <div className="text-xl font-bold text-[#800000]">
-                  {currentScore.runs}/{currentScore.wickets} (
-                  {currentScore.overs})
+                  {inningData.runs}/{inningData.wickets} ({inningData.overs})
                 </div>
               </div>
             </div>
@@ -405,11 +515,11 @@ export default function ScoreEntry() {
                     variant="outline"
                     size="icon"
                     className="h-10 w-10 border-[#E5E5E5] hover:bg-[#F5F5F5]"
-                    // onClick={() => {
-                    //   const temp = striker;
-                    //   setStriker(nonStriker);
-                    //   setNonStriker(temp);
-                    // }}
+                    onClick={() => {
+                      const temp = striker;
+                      setStriker(nonStriker);
+                      setNonStriker(temp);
+                    }}
                   >
                     <ArrowLeftRight className="h-4 w-4" />
                   </Button>
