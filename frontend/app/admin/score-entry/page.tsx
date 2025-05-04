@@ -28,6 +28,7 @@ import { useRouter } from "next/navigation";
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import { app } from "@/lib/firebase";
 import { get, getDatabase, ref, set } from "firebase/database";
+import { run } from "node:test";
 
 interface TeamProps {
   name: string;
@@ -303,31 +304,50 @@ export default function ScoreEntry() {
       }
     }
   }, [battingTeam]);
+  useEffect(() => {
+    const i = inningData;
+
+    if (bowler != inningData.bowler) {
+      if (selectedMatch && inning != "") {
+        const refference = ref(
+          db,
+          `matches/${selectedMatch}/innings/${inning}`
+        );
+        i.bowler = bowler;
+        set(refference, i);
+      }
+    }
+  }, [bowler]);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // const ref1 = ref(db, `${selectedMatch}/${striker}`);
-    // set(ref1, strickerData);
+    const data = inningData;
+    data.runs = inningData.runs + Number(runs);
+    data.overs = data.overs + 1;
 
-    // // const nonStrickerData: BatsmanProps = {
-    // //   runs: 10,
-    // //   balls: 20,
-    // //   sixes: 1,
-    // //   fours: 1,
-    // // };
-    // // const ref2 = ref(db, `${selectedMatch}/${nonStriker}`);
-    // // set(ref2, nonStrickerData);
+    if (striker == inningData.batsman1) {
+      data.batsman1Balls = inningData.batsman1Balls + 1;
+      data.batsman1Runs = inningData.batsman1Runs + Number(runs);
+    } else {
+      data.batsman2Balls = inningData.batsman2Balls + 1;
+      data.batsman2Runs = inningData.batsman2Runs + Number(runs);
+    }
 
-    // // Here you would handle the submission to update the score
-    // alert("Ball submitted successfully!");
-    // // Reset form fields
-    // setRuns("0");
-    // setIsWicket(false);
-    // setIsExtra(false);
-    // setExtraType("");
-    // setDismissalType("");
-    // setComment("");
+    if (selectedMatch && inning != "") {
+      const refference = ref(db, `matches/${selectedMatch}/innings/${inning}`);
+      set(refference, data);
+    }
+
+    // Here you would handle the submission to update the score
+    alert("Ball submitted successfully!");
+    // Reset form fields
+    setRuns("0");
+    setIsWicket(false);
+    setIsExtra(false);
+    setExtraType("");
+    setDismissalType("");
+    setComment("");
   };
 
   const handleUndo = () => {
@@ -364,7 +384,13 @@ export default function ScoreEntry() {
               <div className="text-right">
                 <div className="text-sm text-[#666666]">Current Score</div>
                 <div className="text-xl font-bold text-[#800000]">
-                  {inningData.runs}/{inningData.wickets} ({inningData.overs})
+                  {inningData.runs}/{inningData.wickets} (
+                  {parseFloat(
+                    `${Math.floor(inningData.overs / 4)}.${
+                      inningData.overs % 4
+                    }`
+                  )}
+                  )
                 </div>
               </div>
             </div>
