@@ -75,6 +75,8 @@ export default function ScoreEntry() {
 
   const [team1, setTeam1] = useState<TeamProps | null>();
   const [team2, setTeam2] = useState<TeamProps | null>();
+  const [isLive, setIsLive] = useState(false);
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (!user) {
@@ -99,6 +101,32 @@ export default function ScoreEntry() {
         console.log(error);
       });
   };
+
+  useEffect(() => {
+    if (matches && matches[selectedMatch as string].status == "live") {
+      setIsLive(true);
+    } else {
+      setIsLive(false);
+    }
+  }, [selectedMatch]);
+
+  useEffect(() => {
+    if (isLive) {
+      if (matches && matches[selectedMatch as string].status != "live") {
+        const matchData = matches[selectedMatch as string];
+        const refference = ref(db, `matches/${selectedMatch}`);
+        matchData.status = "live";
+        set(refference, matchData);
+      }
+    } else {
+      if (matches && matches[selectedMatch as string].status == "live") {
+        const matchData = matches[selectedMatch as string];
+        const refference = ref(db, `matches/${selectedMatch}`);
+        matchData.status = "pending";
+        set(refference, matchData);
+      }
+    }
+  }, [isLive]);
 
   // get matches from the database
   useEffect(() => {
@@ -296,34 +324,30 @@ export default function ScoreEntry() {
                 </div>
                 <div className="space-y-2">
                   <Label>Over Progress</Label>
-                  <div className="flex items-center gap-2">
-                    <Input
-                      type="number"
-                      min="1"
-                      max="4"
-                      value={over}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                        const value = parseInt(e.target.value);
-                        if (value >= 1 && value <= 4) {
-                          setOver(value.toString());
-                        }
-                      }}
-                      className="w-20 bg-white border-[#E5E5E5]"
-                    />
-                    <span className="text-lg font-medium">.</span>
-                    <Input
-                      type="number"
-                      min="1"
-                      max="4"
-                      value={ball}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                        const value = parseInt(e.target.value);
-                        if (value >= 1 && value <= 4) {
-                          setBall(value.toString());
-                        }
-                      }}
-                      className="w-20 bg-white border-[#E5E5E5]"
-                    />
+                  <div className="flex items-center gap-3">
+                    <label
+                      htmlFor="live-toggle"
+                      className="flex items-center cursor-pointer"
+                    >
+                      <div className="relative">
+                        <input
+                          type="checkbox"
+                          id="live-toggle"
+                          className="sr-only"
+                          checked={isLive}
+                          onChange={() => setIsLive(!isLive)}
+                        />
+                        <div className="w-14 h-8 bg-gray-300 rounded-full shadow-inner transition" />
+                        <div
+                          className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full shadow transition-transform ${
+                            isLive ? "translate-x-6" : ""
+                          }`}
+                        />
+                      </div>
+                      <span className="ml-3 text-lg font-medium">
+                        {isLive ? "Live" : "Not Live"}
+                      </span>
+                    </label>
                   </div>
                 </div>
               </CardContent>
