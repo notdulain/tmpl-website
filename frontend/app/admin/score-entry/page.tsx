@@ -31,6 +31,7 @@ import { get, getDatabase, ref, set } from "firebase/database";
 import { run } from "node:test";
 
 interface TeamProps {
+  [key: string]: string;
   name: string;
   member1: string;
   member2: string;
@@ -94,6 +95,7 @@ export default function ScoreEntry() {
   const [dismissalType, setDismissalType] = useState("");
   const [comment, setComment] = useState("");
   const [battingTeam, setBattingTeam] = useState("");
+  const [lossBatsman, setLossBatsman] = useState("");
   const [inningData, setInningData] = useState<InningDataProps>({
     battingTeam: "",
     runs: 0,
@@ -319,10 +321,48 @@ export default function ScoreEntry() {
     }
   }, [bowler]);
 
+  const handleExtra = (data: InningDataProps) => {
+    switch (extraType) {
+      case "wide":
+        data.wides = inningData.wides + 1;
+        break;
+      case "no ball":
+        data.noBals = inningData.noBals + 1;
+        break;
+      case "bye":
+        data.byes = inningData.byes + 1;
+        break;
+      case "leg bye":
+        data.legByes = inningData.legByes + 1;
+        break;
+    }
+    return data;
+  };
+
+  const handleWicket = (data: InningDataProps) => {
+    if (lossBatsman == striker) {
+      setStriker("");
+    } else {
+      setNonStriker("");
+    }
+    if ((inningData.batsman1 = lossBatsman)) {
+      data.batsman1 = "";
+      data.batsman1Balls = 0;
+      data.batsman1Runs = 0;
+    } else {
+      data.batsman2 = "";
+      data.batsman1Balls = 0;
+      data.batsman1Runs = 0;
+    }
+
+    data.wickets = inningData.wickets + 1;
+    return data;
+  };
+
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const data = inningData;
+    let data = inningData;
     data.runs = inningData.runs + Number(runs);
     data.overs = data.overs + 1;
 
@@ -332,6 +372,13 @@ export default function ScoreEntry() {
     } else {
       data.batsman2Balls = inningData.batsman2Balls + 1;
       data.batsman2Runs = inningData.batsman2Runs + Number(runs);
+    }
+
+    if (isExtra) {
+      data = handleExtra(data);
+    }
+    if (isWicket) {
+      data = handleWicket(data);
     }
 
     if (selectedMatch && inning != "") {
@@ -734,6 +781,41 @@ export default function ScoreEntry() {
                           {type}
                         </Button>
                       ))}
+                    </div>
+                    <div>
+                      <Label htmlFor="nonStriker">Non-Striker</Label>
+
+                      <Select
+                        value={lossBatsman}
+                        onValueChange={setLossBatsman}
+                      >
+                        <SelectTrigger
+                          id="battingTeam"
+                          className="bg-white border-[#E5E5E5]"
+                        >
+                          <SelectValue placeholder="Select Batting Team" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {striker && nonStriker && (
+                            <>
+                              <SelectItem key={striker} value={striker}>
+                                {team1 &&
+                                  team2 &&
+                                  (battingTeam == "team1"
+                                    ? team1[striker]
+                                    : team2[striker])}
+                              </SelectItem>
+                              <SelectItem key={nonStriker} value={nonStriker}>
+                                {team1 &&
+                                  team2 &&
+                                  (battingTeam == "team1"
+                                    ? team1[nonStriker]
+                                    : team2[nonStriker])}
+                              </SelectItem>
+                            </>
+                          )}
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
                 )}
