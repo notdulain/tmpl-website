@@ -27,6 +27,36 @@ import {
 import { useRouter } from "next/navigation";
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import { app } from "@/lib/firebase";
+import { getDatabase, ref, set } from "firebase/database";
+
+interface MathcProps {
+  live: Boolean;
+  score: Number;
+  wicket: Number;
+  over: Number;
+  stricker: String;
+  nonStricker: String;
+  bowler: String;
+  wides: Number;
+  noBolws: Number;
+  byes: Number;
+  legByes: Number;
+}
+
+interface BatsmanProps {
+  runs: Number;
+  balls: Number;
+  sixes: Number;
+  fours: Number;
+}
+
+interface Deliveries {
+  delivery: String;
+}
+interface PlayerDetailProp {
+  id: Number;
+  name: String;
+}
 
 export default function ScoreEntry() {
   const router = useRouter();
@@ -44,6 +74,8 @@ export default function ScoreEntry() {
     return () => unsubscribe();
   }, [auth, router]);
 
+  const db = getDatabase();
+
   const logOut = () => {
     signOut(auth)
       .then(() => {
@@ -56,53 +88,55 @@ export default function ScoreEntry() {
   };
 
   // Mock data
-  const matches = [
-    {
-      id: "match-1",
-      team1: "Eloquent Eagles",
-      team2: "Dynamic Dragons",
-      status: "In Progress",
-    },
-    {
-      id: "match-2",
-      team1: "Vocal Vikings",
-      team2: "Speaking Spartans",
-      status: "Upcoming",
-    },
-  ];
+  // const matches = [
+  //   {
+  //     id: "match-1",
+  //     team1: "Eloquent Eagles",
+  //     team2: "Dynamic Dragons",
+  //     status: "In Progress",
+  //   },
+  //   {
+  //     id: "match-2",
+  //     team1: "Vocal Vikings",
+  //     team2: "Speaking Spartans",
+  //     status: "Upcoming",
+  //   },
+  // ];
 
-  const teams = {
-    "Eloquent Eagles": {
-      players: [
-        "A. Smith",
-        "J. Kumar",
-        "R. Johnson",
-        "S. Patel",
-        "M. Williams",
-        "D. Brown",
-        "T. Garcia",
-        "K. Lee",
-      ],
-    },
-    "Dynamic Dragons": {
-      players: [
-        "L. Anderson",
-        "R. Patel",
-        "C. Martinez",
-        "J. Thompson",
-        "B. Jackson",
-        "S. Clark",
-        "H. Rodriguez",
-        "F. Lewis",
-      ],
-    },
-  };
+  // const teams = {
+  //   "Eloquent Eagles": {
+  //     players: [
+  //       { id: 1, name: "A. Smith" },
+  //       { id: 2, name: "J. Kumar" },
+  //       { id: 3, name: "R. Johnson" },
+  //       { id: 4, name: "S. Patel" },
+  //       { id: 5, name: "M. Williams" },
+  //       { id: 6, name: "D. Brown" },
+  //       { id: 7, name: "T. Garcia" },
+  //       { id: 8, name: "K. Lee" },
+  //     ],
+  //   },
+  //   "Dynamic Dragons": {
+  //     players: [
+  //       { id: 9, name: "L. Anderson" },
+  //       { id: 10, name: "R. Patel" },
+  //       { id: 11, name: "C. Martinez" },
+  //       { id: 12, name: "J. Thompson" },
+  //       { id: 13, name: "B. Jackson" },
+  //       { id: 14, name: "S. Clark" },
+  //       { id: 15, name: "H. Rodriguez" },
+  //       { id: 16, name: "F. Lewis" },
+  //     ],
+  //   },
+  // };
 
-  const [selectedMatch, setSelectedMatch] = useState("match-1");
+  const [matchData, setMatchData] = useState<MathcProps>();
+
+  const [selectedMatch, setSelectedMatch] = useState<string>("match-1");
   const [inning, setInning] = useState("1");
   const [over, setOver] = useState("0");
   const [ball, setBall] = useState("0");
-  const [striker, setStriker] = useState("");
+  const [striker, setStriker] = useState<Number>();
   const [nonStriker, setNonStriker] = useState("");
   const [bowler, setBowler] = useState("");
   const [runs, setRuns] = useState("0");
@@ -127,6 +161,41 @@ export default function ScoreEntry() {
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    const matchData: MathcProps = {
+      live: true,
+      score: 10,
+      wicket: 1,
+      over: 1.1,
+      stricker: striker,
+      nonStricker: nonStriker,
+      bowler: bowler,
+      wides: 0,
+      noBolws: 1,
+      byes: 1,
+      legByes: 3,
+    };
+    const refference = ref(db, `${selectedMatch}/info`);
+    set(refference, matchData);
+
+    const strickerData: BatsmanProps = {
+      runs: 10,
+      balls: 20,
+      sixes: 1,
+      fours: 1,
+    };
+    const ref1 = ref(db, `${selectedMatch}/${striker}`);
+    set(ref1, strickerData);
+
+    // const nonStrickerData: BatsmanProps = {
+    //   runs: 10,
+    //   balls: 20,
+    //   sixes: 1,
+    //   fours: 1,
+    // };
+    // const ref2 = ref(db, `${selectedMatch}/${nonStriker}`);
+    // set(ref2, nonStrickerData);
+
     // Here you would handle the submission to update the score
     alert("Ball submitted successfully!");
     // Reset form fields
@@ -280,9 +349,12 @@ export default function ScoreEntry() {
                       <SelectValue placeholder="Select striker" />
                     </SelectTrigger>
                     <SelectContent>
-                      {teams["Eloquent Eagles"].players.map((player) => (
-                        <SelectItem key={player} value={player}>
-                          {player}
+                      {teams["Dynamic Dragons"].players.map((player) => (
+                        <SelectItem
+                          key={player.id}
+                          value={player.id.toString()}
+                        >
+                          {player.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -313,9 +385,9 @@ export default function ScoreEntry() {
                       <SelectValue placeholder="Select non-striker" />
                     </SelectTrigger>
                     <SelectContent>
-                      {teams["Eloquent Eagles"].players.map((player) => (
-                        <SelectItem key={player} value={player}>
-                          {player}
+                      {teams[matches.find].players.map((player) => (
+                        <SelectItem key={player.id} value={player.name}>
+                          {player.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -332,8 +404,8 @@ export default function ScoreEntry() {
                     </SelectTrigger>
                     <SelectContent>
                       {teams["Dynamic Dragons"].players.map((player) => (
-                        <SelectItem key={player} value={player}>
-                          {player}
+                        <SelectItem key={player.id} value={player.name}>
+                          {player.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
