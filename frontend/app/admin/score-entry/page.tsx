@@ -68,6 +68,7 @@ interface InningDataProps {
   noBals: number;
   byes: number;
   legByes: number;
+  completed: boolean;
 }
 
 export default function ScoreEntry() {
@@ -113,6 +114,7 @@ export default function ScoreEntry() {
     noBals: 0,
     byes: 0,
     legByes: 0,
+    completed: false,
   });
 
   useEffect(() => {
