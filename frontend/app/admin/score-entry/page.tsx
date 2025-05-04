@@ -27,20 +27,26 @@ import {
 import { useRouter } from "next/navigation";
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import { app } from "@/lib/firebase";
-import { getDatabase, ref, set } from "firebase/database";
+import { get, getDatabase, ref, set } from "firebase/database";
+
+interface TeamProps {
+  name: string;
+  member1: string;
+  member2: string;
+  member3: string;
+  member4: string;
+  member5: string;
+  member6: string;
+  member7: string;
+  member8: string;
+}
 
 interface MathcProps {
-  live: Boolean;
-  score: Number;
-  wicket: Number;
-  over: Number;
-  stricker: String;
-  nonStricker: String;
-  bowler: String;
-  wides: Number;
-  noBolws: Number;
-  byes: Number;
-  legByes: Number;
+  status: string;
+  team1: string;
+  team2: string;
+  toss: string;
+  tossDecisiton: String;
 }
 
 interface BatsmanProps {
@@ -62,6 +68,13 @@ export default function ScoreEntry() {
   const router = useRouter();
   const auth = getAuth(app);
   const [authState, setAuthState] = useState(false);
+  const [matches, setMatches] = useState<Record<string, MathcProps> | null>(
+    null
+  );
+  const [selectedMatch, setSelectedMatch] = useState<string>();
+
+  const [team1, setTeam1] = useState<TeamProps | null>();
+  const [team2, setTeam2] = useState<TeamProps | null>();
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (!user) {
@@ -87,52 +100,55 @@ export default function ScoreEntry() {
       });
   };
 
-  // Mock data
-  // const matches = [
-  //   {
-  //     id: "match-1",
-  //     team1: "Eloquent Eagles",
-  //     team2: "Dynamic Dragons",
-  //     status: "In Progress",
-  //   },
-  //   {
-  //     id: "match-2",
-  //     team1: "Vocal Vikings",
-  //     team2: "Speaking Spartans",
-  //     status: "Upcoming",
-  //   },
-  // ];
+  // get matches from the database
+  useEffect(() => {
+    const fetchData = async () => {
+      const dbRef = ref(db, "matches/");
+      const snapshot = await get(dbRef);
+      if (snapshot.exists()) {
+        // Get only the keys
+        const data = snapshot.val();
+        setMatches(data);
+      } else {
+        console.log("doesn't founds");
+      }
+    };
+    fetchData();
+  }, []);
 
-  // const teams = {
-  //   "Eloquent Eagles": {
-  //     players: [
-  //       { id: 1, name: "A. Smith" },
-  //       { id: 2, name: "J. Kumar" },
-  //       { id: 3, name: "R. Johnson" },
-  //       { id: 4, name: "S. Patel" },
-  //       { id: 5, name: "M. Williams" },
-  //       { id: 6, name: "D. Brown" },
-  //       { id: 7, name: "T. Garcia" },
-  //       { id: 8, name: "K. Lee" },
-  //     ],
-  //   },
-  //   "Dynamic Dragons": {
-  //     players: [
-  //       { id: 9, name: "L. Anderson" },
-  //       { id: 10, name: "R. Patel" },
-  //       { id: 11, name: "C. Martinez" },
-  //       { id: 12, name: "J. Thompson" },
-  //       { id: 13, name: "B. Jackson" },
-  //       { id: 14, name: "S. Clark" },
-  //       { id: 15, name: "H. Rodriguez" },
-  //       { id: 16, name: "F. Lewis" },
-  //     ],
-  //   },
-  // };
+  //get teams data from the database
+  useEffect(() => {
+    const fetchData = async () => {
+      if (matches && selectedMatch && selectedMatch in matches) {
+        const match = matches[selectedMatch as string];
 
-  const [matchData, setMatchData] = useState<MathcProps>();
+        const dbRef = ref(db, `teams/${match.team1}`);
+        const snapshot = await get(dbRef);
+        if (snapshot.exists()) {
+          // Get only the keys
+          const data = snapshot.val();
+          console.log(data);
+          setTeam1(data);
+        } else {
+          console.log("doesn't founds");
+        }
+        const dbRef2 = ref(db, `teams/${match.team2}`);
+        const snapshot2 = await get(dbRef2);
+        if (snapshot2.exists()) {
+          // Get only the keys
+          const data = snapshot2.val();
+          console.log(data);
+          setTeam2(data);
+        } else {
+          console.log("doesn't founds");
+        }
+      }
+    };
+    if (matches) {
+      fetchData();
+    }
+  }, [selectedMatch]);
 
-  const [selectedMatch, setSelectedMatch] = useState<string>("match-1");
   const [inning, setInning] = useState("1");
   const [over, setOver] = useState("0");
   const [ball, setBall] = useState("0");
@@ -161,22 +177,6 @@ export default function ScoreEntry() {
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    const matchData: MathcProps = {
-      live: true,
-      score: 10,
-      wicket: 1,
-      over: 1.1,
-      stricker: striker,
-      nonStricker: nonStriker,
-      bowler: bowler,
-      wides: 0,
-      noBolws: 1,
-      byes: 1,
-      legByes: 3,
-    };
-    const refference = ref(db, `${selectedMatch}/info`);
-    set(refference, matchData);
 
     const strickerData: BatsmanProps = {
       runs: 10,
@@ -262,10 +262,7 @@ export default function ScoreEntry() {
               <CardContent className="grid grid-cols-3 gap-6">
                 <div className="space-y-2">
                   <Label htmlFor="match">Match</Label>
-                  <Select
-                    value={selectedMatch}
-                    onValueChange={setSelectedMatch}
-                  >
+                  <Select onValueChange={setSelectedMatch}>
                     <SelectTrigger
                       id="match"
                       className="bg-white border-[#E5E5E5]"
@@ -273,11 +270,12 @@ export default function ScoreEntry() {
                       <SelectValue placeholder="Select match" />
                     </SelectTrigger>
                     <SelectContent>
-                      {matches.map((match) => (
-                        <SelectItem key={match.id} value={match.id}>
-                          {match.team1} vs {match.team2}
-                        </SelectItem>
-                      ))}
+                      {matches &&
+                        Object.entries(matches).map(([key, match]) => (
+                          <SelectItem key={key} value={key}>
+                            {match.team1} vs {match.team2}
+                          </SelectItem>
+                        ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -341,7 +339,7 @@ export default function ScoreEntry() {
               <CardContent className="grid grid-cols-3 gap-6">
                 <div className="space-y-2">
                   <Label htmlFor="striker">Striker</Label>
-                  <Select value={striker} onValueChange={setStriker}>
+                  {/* <Select value={striker} onValueChange={setStriker}>
                     <SelectTrigger
                       id="striker"
                       className="bg-white border-[#E5E5E5]"
@@ -358,7 +356,7 @@ export default function ScoreEntry() {
                         </SelectItem>
                       ))}
                     </SelectContent>
-                  </Select>
+                  </Select> */}
                 </div>
                 <div className="flex items-end justify-center pb-2">
                   <Button
@@ -366,18 +364,18 @@ export default function ScoreEntry() {
                     variant="outline"
                     size="icon"
                     className="h-10 w-10 border-[#E5E5E5] hover:bg-[#F5F5F5]"
-                    onClick={() => {
-                      const temp = striker;
-                      setStriker(nonStriker);
-                      setNonStriker(temp);
-                    }}
+                    // onClick={() => {
+                    //   const temp = striker;
+                    //   setStriker(nonStriker);
+                    //   setNonStriker(temp);
+                    // }}
                   >
                     <ArrowLeftRight className="h-4 w-4" />
                   </Button>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="nonStriker">Non-Striker</Label>
-                  <Select value={nonStriker} onValueChange={setNonStriker}>
+                  {/* <Select value={nonStriker} onValueChange={setNonStriker}>
                     <SelectTrigger
                       id="nonStriker"
                       className="bg-white border-[#E5E5E5]"
@@ -391,11 +389,11 @@ export default function ScoreEntry() {
                         </SelectItem>
                       ))}
                     </SelectContent>
-                  </Select>
+                  </Select> */}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="bowler">Bowler</Label>
-                  <Select value={bowler} onValueChange={setBowler}>
+                  {/* <Select value={bowler} onValueChange={setBowler}>
                     <SelectTrigger
                       id="bowler"
                       className="bg-white border-[#E5E5E5]"
@@ -409,7 +407,7 @@ export default function ScoreEntry() {
                         </SelectItem>
                       ))}
                     </SelectContent>
-                  </Select>
+                  </Select> */}
                 </div>
               </CardContent>
             </Card>
