@@ -1,464 +1,862 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ArrowLeft, Save, Plus, Minus, LogOut } from "lucide-react"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { useRouter } from "next/navigation"
+import { useState, FormEvent, useEffect } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  ArrowLeft,
+  Save,
+  Undo2,
+  Plus,
+  Minus,
+  ArrowLeftRight,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
+import { app } from "@/lib/firebase";
+import { get, getDatabase, ref, set } from "firebase/database";
+import { run } from "node:test";
+
+interface TeamProps {
+  [key: string]: string;
+  name: string;
+  member1: string;
+  member2: string;
+  member3: string;
+  member4: string;
+  member5: string;
+  member6: string;
+  member7: string;
+  member8: string;
+}
+
+interface MathcProps {
+  status: string;
+  team1: string;
+  team2: string;
+  toss: string;
+  tossDecisiton: String;
+}
+
+interface InningDataProps {
+  battingTeam: string;
+  runs: number;
+  wickets: number;
+  overs: number;
+  stricker: string;
+  batsman1: string;
+  batsman2: string;
+  batsman1Runs: number;
+  batsman1Balls: number;
+  batsman2Runs: number;
+  batsman2Balls: number;
+  bowler: string;
+  wides: number;
+  noBals: number;
+  byes: number;
+  legByes: number;
+  completed: boolean;
+}
 
 export default function ScoreEntry() {
-  const router = useRouter()
+  const router = useRouter();
+  const auth = getAuth(app);
+  const [authState, setAuthState] = useState(false);
+  const [matches, setMatches] = useState<Record<string, MathcProps> | null>(
+    null
+  );
+  const [selectedMatch, setSelectedMatch] = useState<string>();
 
-  // Mock data
-  const matches = [
-    { id: "match-1", team1: "Eloquent Eagles", team2: "Dynamic Dragons", status: "In Progress" },
-    { id: "match-2", team1: "Vocal Vikings", team2: "Speaking Spartans", status: "Upcoming" },
-  ]
+  const [team1, setTeam1] = useState<TeamProps | null>();
+  const [team2, setTeam2] = useState<TeamProps | null>();
+  const [isLive, setIsLive] = useState(false);
+  const [inning, setInning] = useState("");
+  const [over, setOver] = useState("0");
+  const [ball, setBall] = useState("0");
+  const [striker, setStriker] = useState("");
+  const [nonStriker, setNonStriker] = useState("");
+  const [bowler, setBowler] = useState("");
+  const [runs, setRuns] = useState("0");
+  const [isWicket, setIsWicket] = useState(false);
+  const [isExtra, setIsExtra] = useState(false);
+  const [extraType, setExtraType] = useState("");
+  const [dismissalType, setDismissalType] = useState("");
+  const [comment, setComment] = useState("");
+  const [battingTeam, setBattingTeam] = useState("");
+  const [lossBatsman, setLossBatsman] = useState("");
+  const [inningData, setInningData] = useState<InningDataProps>({
+    battingTeam: "",
+    runs: 0,
+    wickets: 0,
+    overs: 0.0,
+    stricker: "",
+    batsman1: "",
+    batsman2: "",
+    batsman1Runs: 0,
+    batsman1Balls: 0,
+    batsman2Runs: 0,
+    batsman2Balls: 0,
+    bowler: "",
+    wides: 0,
+    noBals: 0,
+    byes: 0,
+    legByes: 0,
+    completed: false,
+  });
 
-  const teams = {
-    "Eloquent Eagles": {
-      players: [
-        "A. Smith",
-        "J. Kumar",
-        "R. Johnson",
-        "S. Patel",
-        "M. Williams",
-        "D. Brown",
-        "T. Garcia",
-        "K. Lee",
-        "N. Taylor",
-        "P. Wilson",
-      ],
-    },
-    "Dynamic Dragons": {
-      players: [
-        "L. Anderson",
-        "R. Patel",
-        "C. Martinez",
-        "J. Thompson",
-        "B. Jackson",
-        "S. Clark",
-        "H. Rodriguez",
-        "F. Lewis",
-        "G. Walker",
-        "V. Hall",
-      ],
-    },
-  }
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        router.push("/admin");
+      } else {
+        setAuthState(true);
+      }
+    });
 
-  const [selectedMatch, setSelectedMatch] = useState("match-1")
-  const [selectedTab, setSelectedTab] = useState("runs")
-  const [runs, setRuns] = useState(0)
-  const [wickets, setWickets] = useState(0)
-  const [selectedBatsman, setSelectedBatsman] = useState("")
-  const [selectedBowler, setSelectedBowler] = useState("")
-  const [extraType, setExtraType] = useState("wide")
-  const [extraRuns, setExtraRuns] = useState(1)
+    return () => unsubscribe();
+  }, [auth, router]);
 
-  const handleRunsSubmit = (e) => {
-    e.preventDefault()
+  const db = getDatabase();
+
+  const logOut = () => {
+    signOut(auth)
+      .then(() => {
+        router.push("/admin");
+        console.log("Signed out successfully");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  useEffect(() => {
+    if (matches && matches[selectedMatch as string].status == "live") {
+      setIsLive(true);
+    } else {
+      setIsLive(false);
+    }
+  }, [selectedMatch]);
+
+  useEffect(() => {
+    if (isLive) {
+      if (matches && matches[selectedMatch as string].status != "live") {
+        const matchData = matches[selectedMatch as string];
+        const refference = ref(db, `matches/${selectedMatch}`);
+        matchData.status = "live";
+        set(refference, matchData);
+      }
+    } else {
+      if (matches && matches[selectedMatch as string].status == "live") {
+        const matchData = matches[selectedMatch as string];
+        const refference = ref(db, `matches/${selectedMatch}`);
+        matchData.status = "pending";
+        set(refference, matchData);
+      }
+    }
+  }, [isLive]);
+
+  // get matches from the database
+  useEffect(() => {
+    const fetchData = async () => {
+      const dbRef = ref(db, "matches/");
+      const snapshot = await get(dbRef);
+      if (snapshot.exists()) {
+        // Get only the keys
+        const data = snapshot.val();
+        setMatches(data);
+      } else {
+        console.log("doesn't founds");
+      }
+    };
+    fetchData();
+  }, []);
+
+  //get teams data from the database
+  useEffect(() => {
+    const fetchData = async () => {
+      if (matches && selectedMatch && selectedMatch in matches) {
+        const match = matches[selectedMatch as string];
+
+        const dbRef = ref(db, `teams/${match.team1}`);
+        const snapshot = await get(dbRef);
+        if (snapshot.exists()) {
+          // Get only the keys
+          const data = snapshot.val();
+          console.log(data);
+          setTeam1(data);
+        } else {
+          console.log("doesn't founds");
+        }
+        const dbRef2 = ref(db, `teams/${match.team2}`);
+        const snapshot2 = await get(dbRef2);
+        if (snapshot2.exists()) {
+          // Get only the keys
+          const data = snapshot2.val();
+          console.log(data);
+          setTeam2(data);
+        } else {
+          console.log("doesn't founds");
+        }
+      }
+    };
+    if (matches) {
+      fetchData();
+      setStriker("");
+      setNonStriker("");
+      setBattingTeam("");
+      setBattingTeam("");
+    }
+  }, [selectedMatch]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (selectedMatch && inning != "") {
+        const dbRef = ref(db, `matches/${selectedMatch}/innings/${inning}`);
+        const snapshot = await get(dbRef);
+        if (snapshot.exists()) {
+          const data: InningDataProps = snapshot.val();
+          setInningData(data);
+          setBattingTeam(data.battingTeam);
+          const batsman1 = data.batsman1;
+          const batsman2 = data.batsman2;
+          if (batsman1 == data.stricker) {
+            setStriker(batsman1);
+            setNonStriker(batsman2);
+          } else {
+            setStriker(batsman1);
+            setNonStriker(batsman2);
+          }
+          setBowler(data.bowler);
+        } else {
+          set(dbRef, inningData);
+        }
+      }
+    };
+    fetchData();
+  }, [inning]);
+
+  useEffect(() => {
+    if (striker != "") {
+      const i = inningData;
+      i.stricker = striker;
+      if (selectedMatch && inning != "") {
+        const refference = ref(
+          db,
+          `matches/${selectedMatch}/innings/${inning}`
+        );
+        set(refference, i);
+      }
+      setInningData(i);
+    }
+  }, [striker]);
+
+  useEffect(() => {
+    const i = inningData;
+    console.log("hello");
+
+    if (striker != inningData.batsman1 && striker != inningData.batsman2) {
+      console.log("hello");
+
+      if (nonStriker == inningData.batsman1) {
+        i.batsman2 = striker;
+      } else {
+        i.batsman1 = striker;
+      }
+    }
+    if (
+      nonStriker != inningData.batsman1 &&
+      nonStriker != inningData.batsman2
+    ) {
+      console.log("hello");
+
+      if (striker == inningData.batsman1) {
+        i.batsman2 = nonStriker;
+      } else {
+        i.batsman1 = nonStriker;
+      }
+    }
+    if (selectedMatch && inning != "") {
+      const refference = ref(db, `matches/${selectedMatch}/innings/${inning}`);
+      set(refference, i);
+    }
+  }, [striker, nonStriker]);
+
+  useEffect(() => {
+    const i = inningData;
+
+    if (battingTeam != inningData.battingTeam) {
+      if (selectedMatch && inning != "") {
+        const refference = ref(
+          db,
+          `matches/${selectedMatch}/innings/${inning}`
+        );
+        i.battingTeam = battingTeam;
+        set(refference, i);
+      }
+    }
+  }, [battingTeam]);
+  useEffect(() => {
+    const i = inningData;
+
+    if (bowler != inningData.bowler) {
+      if (selectedMatch && inning != "") {
+        const refference = ref(
+          db,
+          `matches/${selectedMatch}/innings/${inning}`
+        );
+        i.bowler = bowler;
+        set(refference, i);
+      }
+    }
+  }, [bowler]);
+
+  const handleExtra = (data: InningDataProps) => {
+    switch (extraType) {
+      case "wide":
+        data.wides = inningData.wides + 1;
+        break;
+      case "no ball":
+        data.noBals = inningData.noBals + 1;
+        break;
+      case "bye":
+        data.byes = inningData.byes + 1;
+        break;
+      case "leg bye":
+        data.legByes = inningData.legByes + 1;
+        break;
+    }
+    return data;
+  };
+
+  const handleWicket = (data: InningDataProps) => {
+    if (lossBatsman == striker) {
+      setStriker("");
+    } else {
+      setNonStriker("");
+    }
+    if ((inningData.batsman1 = lossBatsman)) {
+      data.batsman1 = "";
+      data.batsman1Balls = 0;
+      data.batsman1Runs = 0;
+    } else {
+      data.batsman2 = "";
+      data.batsman1Balls = 0;
+      data.batsman1Runs = 0;
+    }
+
+    data.wickets = inningData.wickets + 1;
+    return data;
+  };
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    let data = inningData;
+    data.runs = inningData.runs + Number(runs);
+    data.overs = data.overs + 1;
+
+    if (striker == inningData.batsman1) {
+      data.batsman1Balls = inningData.batsman1Balls + 1;
+      data.batsman1Runs = inningData.batsman1Runs + Number(runs);
+    } else {
+      data.batsman2Balls = inningData.batsman2Balls + 1;
+      data.batsman2Runs = inningData.batsman2Runs + Number(runs);
+    }
+
+    if (isExtra) {
+      data = handleExtra(data);
+    }
+    if (isWicket) {
+      data = handleWicket(data);
+    }
+
+    if (selectedMatch && inning != "") {
+      const refference = ref(db, `matches/${selectedMatch}/innings/${inning}`);
+      set(refference, data);
+    }
+
     // Here you would handle the submission to update the score
-    alert(`Added ${runs} runs for ${selectedBatsman}`)
-    setRuns(0)
-  }
+    alert("Ball submitted successfully!");
+    // Reset form fields
+    setRuns("0");
+    setIsWicket(false);
+    setIsExtra(false);
+    setExtraType("");
+    setDismissalType("");
+    setComment("");
+  };
 
-  const handleWicketSubmit = (e) => {
-    e.preventDefault()
-    // Here you would handle the submission to update wickets
-    alert(`Wicket: ${selectedBatsman} out, bowled by ${selectedBowler}`)
-  }
-
-  const handleExtraSubmit = (e) => {
-    e.preventDefault()
-    // Here you would handle the submission to update extras
-    alert(`Added ${extraRuns} runs as ${extraType}`)
-    setExtraRuns(1)
-  }
-
-  const handleLogout = () => {
-    router.push("/admin")
-  }
+  const handleUndo = () => {
+    // Here you would handle undoing the last ball
+    alert("Last ball undone!");
+  };
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
-      {/* Header */}
-      <header className="border-b border-gray-800">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <Link href="/" className="flex items-center gap-2">
-            <Image
-              src="/placeholder.svg?height=40&width=40"
-              alt="TMPL Logo"
-              width={40}
-              height={40}
-              className="rounded-full"
-            />
-            <span className="font-bold text-xl text-maroon-500">TMPL 2.0</span>
-          </Link>
-          <nav className="hidden md:flex items-center gap-6">
-            <Link href="/" className="text-white hover:text-yellow-300 transition-colors">
-              Home
-            </Link>
-            <Link href="/live-scores" className="text-white hover:text-yellow-300 transition-colors">
-              Live Scores
-            </Link>
-            <Link href="/#about" className="text-white hover:text-yellow-300 transition-colors">
-              About
-            </Link>
-            <Link href="/#organizers" className="text-white hover:text-yellow-300 transition-colors">
-              Organizers
-            </Link>
-          </nav>
-          <Button
-            variant="outline"
-            className="hidden md:flex border-maroon-500 text-maroon-500 hover:bg-maroon-500 hover:text-white"
-            onClick={handleLogout}
-          >
-            <LogOut className="h-4 w-4 mr-2" />
-            Logout
-          </Button>
-          <Button variant="ghost" size="icon" className="md:hidden text-white">
-            <span className="sr-only">Open menu</span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="h-6 w-6"
-            >
-              <line x1="4" x2="20" y1="12" y2="12" />
-              <line x1="4" x2="20" y1="6" y2="6" />
-              <line x1="4" x2="20" y1="18" y2="18" />
-            </svg>
-          </Button>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" asChild>
-              <Link href="/admin">
+    authState && (
+      <div className="min-h-screen bg-[#FAF8F5]">
+        {/* Header */}
+        <header className="bg-white border-b border-[#E5E5E5] sticky top-0 z-50">
+          <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                asChild
+                className="cursor-pointer"
+                onClick={logOut}
+              >
                 <ArrowLeft className="h-5 w-5" />
-                <span className="sr-only">Back to admin</span>
-              </Link>
-            </Button>
-            <h1 className="text-2xl md:text-3xl font-bold">Score Entry</h1>
+              </Button>
+              <div>
+                <h1 className="text-xl font-bold text-[#1A1A1A]">
+                  Score Entry
+                </h1>
+                <p className="text-sm text-[#666666]">
+                  TMPL 2.0 - Match {selectedMatch}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="text-right">
+                <div className="text-sm text-[#666666]">Current Score</div>
+                <div className="text-xl font-bold text-[#800000]">
+                  {inningData.runs}/{inningData.wickets} (
+                  {parseFloat(
+                    `${Math.floor(inningData.overs / 4)}.${
+                      inningData.overs % 4
+                    }`
+                  )}
+                  )
+                </div>
+              </div>
+            </div>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-2 border-maroon-500 text-maroon-500 hover:bg-maroon-500 hover:text-white"
-            onClick={handleLogout}
-          >
-            <LogOut className="h-4 w-4" />
-            Logout
-          </Button>
-        </div>
+        </header>
 
-        <Card className="bg-gray-900 border-gray-800 mb-8">
-          <CardHeader>
-            <CardTitle>Match Selection</CardTitle>
-            <CardDescription className="text-gray-400">Select the match you want to update</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Select value={selectedMatch} onValueChange={setSelectedMatch}>
-              <SelectTrigger className="bg-gray-800 border-gray-700">
-                <SelectValue placeholder="Select match" />
-              </SelectTrigger>
-              <SelectContent className="bg-gray-800 border-gray-700">
-                {matches.map((match) => (
-                  <SelectItem key={match.id} value={match.id}>
-                    {match.team1} vs {match.team2} ({match.status})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </CardContent>
-        </Card>
-
-        <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-4">
-          <TabsList className="bg-gray-800 border-gray-700">
-            <TabsTrigger value="runs" className="data-[state=active]:bg-maroon-500">
-              Runs
-            </TabsTrigger>
-            <TabsTrigger value="wickets" className="data-[state=active]:bg-maroon-500">
-              Wickets
-            </TabsTrigger>
-            <TabsTrigger value="extras" className="data-[state=active]:bg-maroon-500">
-              Extras
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="runs" className="space-y-4">
-            <Card className="bg-gray-900 border-gray-800">
+        {/* Main Content */}
+        <main className="max-w-4xl mx-auto px-6 py-8">
+          <form onSubmit={handleSubmit} className="space-y-8">
+            {/* Match Info Section */}
+            <Card className="bg-white border-[#E5E5E5]">
               <CardHeader>
-                <CardTitle>Add Runs</CardTitle>
-                <CardDescription className="text-gray-400">Update the score by adding runs</CardDescription>
+                <CardTitle className="text-lg font-semibold text-[#1A1A1A]">
+                  Match Information
+                </CardTitle>
               </CardHeader>
-              <CardContent>
-                <form onSubmit={handleRunsSubmit} className="space-y-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="batsman">Batsman</Label>
-                    <Select value={selectedBatsman} onValueChange={setSelectedBatsman} required>
-                      <SelectTrigger id="batsman" className="bg-gray-800 border-gray-700">
-                        <SelectValue placeholder="Select batsman" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-gray-800 border-gray-700">
-                        {teams["Eloquent Eagles"].players.map((player) => (
-                          <SelectItem key={player} value={player}>
-                            {player}
+              <CardContent className="grid grid-cols-3 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="match">Match</Label>
+                  <Select onValueChange={setSelectedMatch}>
+                    <SelectTrigger
+                      id="match"
+                      className="bg-white border-[#E5E5E5]"
+                    >
+                      <SelectValue placeholder="Select match" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {matches &&
+                        Object.entries(matches).map(([key, match]) => (
+                          <SelectItem key={key} value={key}>
+                            {match.team1} vs {match.team2}
                           </SelectItem>
                         ))}
-                      </SelectContent>
-                    </Select>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="inning">Inning</Label>
+                  <Select value={inning} onValueChange={setInning}>
+                    <SelectTrigger
+                      id="inning"
+                      className="bg-white border-[#E5E5E5]"
+                    >
+                      <SelectValue placeholder="Select inning" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">1st Inning</SelectItem>
+                      <SelectItem value="2">2nd Inning</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Over Progress</Label>
+                  <div className="flex items-center gap-3">
+                    <label
+                      htmlFor="live-toggle"
+                      className="flex items-center cursor-pointer"
+                    >
+                      <div className="relative">
+                        <input
+                          type="checkbox"
+                          id="live-toggle"
+                          className="sr-only"
+                          checked={isLive}
+                          onChange={() => setIsLive(!isLive)}
+                        />
+                        <div className="w-14 h-8 bg-gray-300 rounded-full shadow-inner transition" />
+                        <div
+                          className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full shadow transition-transform ${
+                            isLive ? "translate-x-6" : ""
+                          }`}
+                        />
+                      </div>
+                      <span className="ml-3 text-lg font-medium">
+                        {isLive ? "Live" : "Not Live"}
+                      </span>
+                    </label>
                   </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="runs">Runs</Label>
-                    <div className="flex items-center space-x-2">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        className="h-8 w-8 border-gray-700"
-                        onClick={() => setRuns(Math.max(0, runs - 1))}
-                      >
-                        <Minus className="h-4 w-4" />
-                      </Button>
-                      <Input
-                        id="runs"
-                        type="number"
-                        value={runs}
-                        onChange={(e) => setRuns(Number.parseInt(e.target.value) || 0)}
-                        min="0"
-                        max="6"
-                        className="bg-gray-800 border-gray-700 text-center"
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        className="h-8 w-8 border-gray-700"
-                        onClick={() => setRuns(Math.min(6, runs + 1))}
-                      >
-                        <Plus className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div className="flex justify-end">
-                    <Button type="submit" className="bg-maroon-600 hover:bg-maroon-700">
-                      <Save className="h-4 w-4 mr-2" />
-                      Save Runs
-                    </Button>
-                  </div>
-                </form>
+                </div>
               </CardContent>
             </Card>
-          </TabsContent>
 
-          <TabsContent value="wickets" className="space-y-4">
-            <Card className="bg-gray-900 border-gray-800">
+            {/* Players Section */}
+            <Card className="bg-white border-[#E5E5E5]">
               <CardHeader>
-                <CardTitle>Add Wicket</CardTitle>
-                <CardDescription className="text-gray-400">Update the score by adding a wicket</CardDescription>
+                <CardTitle className="text-lg font-semibold text-[#1A1A1A]">
+                  Players
+                </CardTitle>
               </CardHeader>
-              <CardContent>
-                <form onSubmit={handleWicketSubmit} className="space-y-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="out-batsman">Batsman Out</Label>
-                    <Select value={selectedBatsman} onValueChange={setSelectedBatsman} required>
-                      <SelectTrigger id="out-batsman" className="bg-gray-800 border-gray-700">
-                        <SelectValue placeholder="Select batsman" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-gray-800 border-gray-700">
-                        {teams["Eloquent Eagles"].players.map((player) => (
-                          <SelectItem key={player} value={player}>
-                            {player}
+              <CardContent className="grid grid-cols-3 gap-6">
+                <div className="col-span-3 w-full space-y-2">
+                  <Label htmlFor="bowler">Select Batting Team</Label>
+                  <Select value={battingTeam} onValueChange={setBattingTeam}>
+                    <SelectTrigger
+                      id="battingTeam"
+                      className="bg-white border-[#E5E5E5]"
+                    >
+                      <SelectValue placeholder="Select Batting Team" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {matches && selectedMatch && (
+                        <>
+                          <SelectItem key="team1" value="team1">
+                            {matches[selectedMatch].team1}
                           </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="bowler">Bowler</Label>
-                    <Select value={selectedBowler} onValueChange={setSelectedBowler} required>
-                      <SelectTrigger id="bowler" className="bg-gray-800 border-gray-700">
-                        <SelectValue placeholder="Select bowler" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-gray-800 border-gray-700">
-                        {teams["Dynamic Dragons"].players.map((player) => (
-                          <SelectItem key={player} value={player}>
-                            {player}
+                          <SelectItem key="team2" value="team2">
+                            {matches[selectedMatch].team2}
                           </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                        </>
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-                  <div className="space-y-2">
-                    <Label>Dismissal Type</Label>
-                    <RadioGroup defaultValue="bowled" className="grid grid-cols-2 gap-4 pt-2">
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="bowled" id="bowled" className="border-gray-600" />
-                        <Label htmlFor="bowled" className="font-normal">
-                          Bowled
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="caught" id="caught" className="border-gray-600" />
-                        <Label htmlFor="caught" className="font-normal">
-                          Caught
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="lbw" id="lbw" className="border-gray-600" />
-                        <Label htmlFor="lbw" className="font-normal">
-                          LBW
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="run-out" id="run-out" className="border-gray-600" />
-                        <Label htmlFor="run-out" className="font-normal">
-                          Run Out
-                        </Label>
-                      </div>
-                    </RadioGroup>
-                  </div>
-
-                  <div className="flex justify-end">
-                    <Button type="submit" className="bg-maroon-600 hover:bg-maroon-700">
-                      <Save className="h-4 w-4 mr-2" />
-                      Save Wicket
-                    </Button>
-                  </div>
-                </form>
+                <div className="space-y-2">
+                  <Label htmlFor="striker">Striker</Label>
+                  <Select value={striker} onValueChange={setStriker}>
+                    <SelectTrigger
+                      id="striker"
+                      className="bg-white border-[#E5E5E5]"
+                    >
+                      <SelectValue placeholder="Select striker" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {battingTeam && battingTeam == "team1"
+                        ? team1 &&
+                          Object.entries(team1)
+                            .filter(([key]) => key.startsWith("member"))
+                            .map(([key, value]) => (
+                              <SelectItem key={key} value={key}>
+                                {value as string}
+                              </SelectItem>
+                            ))
+                        : team2 &&
+                          Object.entries(team2)
+                            .filter(([key]) => key.startsWith("member"))
+                            .map(([key, value]) => (
+                              <SelectItem key={key} value={key}>
+                                {value as string}
+                              </SelectItem>
+                            ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex items-end justify-center pb-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    className="h-10 w-10 border-[#E5E5E5] hover:bg-[#F5F5F5]"
+                    onClick={() => {
+                      const temp = striker;
+                      setStriker(nonStriker);
+                      setNonStriker(temp);
+                    }}
+                  >
+                    <ArrowLeftRight className="h-4 w-4" />
+                  </Button>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="nonStriker">Non-Striker</Label>
+                  <Select value={nonStriker} onValueChange={setNonStriker}>
+                    <SelectTrigger
+                      id="nonStriker"
+                      className="bg-white border-[#E5E5E5]"
+                    >
+                      <SelectValue placeholder="Select non-striker" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {battingTeam && battingTeam == "team1"
+                        ? team1 &&
+                          Object.entries(team1)
+                            .filter(([key]) => key.startsWith("member"))
+                            .map(([key, value]) => (
+                              <SelectItem key={key} value={key}>
+                                {value as string}
+                              </SelectItem>
+                            ))
+                        : team2 &&
+                          Object.entries(team2)
+                            .filter(([key]) => key.startsWith("member"))
+                            .map(([key, value]) => (
+                              <SelectItem key={key} value={key}>
+                                {value as string}
+                              </SelectItem>
+                            ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="bowler">Bowler</Label>
+                  <Select value={bowler} onValueChange={setBowler}>
+                    <SelectTrigger
+                      id="bowler"
+                      className="bg-white border-[#E5E5E5]"
+                    >
+                      <SelectValue placeholder="Select bowler" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {battingTeam && battingTeam == "team1"
+                        ? team2 &&
+                          Object.entries(team2)
+                            .filter(([key]) => key.startsWith("member"))
+                            .map(([key, value]) => (
+                              <SelectItem key={key} value={key}>
+                                {value as string}
+                              </SelectItem>
+                            ))
+                        : team1 &&
+                          Object.entries(team1)
+                            .filter(([key]) => key.startsWith("member"))
+                            .map(([key, value]) => (
+                              <SelectItem key={key} value={key}>
+                                {value as string}
+                              </SelectItem>
+                            ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </CardContent>
             </Card>
-          </TabsContent>
 
-          <TabsContent value="extras" className="space-y-4">
-            <Card className="bg-gray-900 border-gray-800">
+            {/* Delivery Result Section */}
+            <Card className="bg-white border-[#E5E5E5]">
               <CardHeader>
-                <CardTitle>Add Extras</CardTitle>
-                <CardDescription className="text-gray-400">Update the score by adding extras</CardDescription>
+                <CardTitle className="text-lg font-semibold text-[#1A1A1A]">
+                  Delivery Result
+                </CardTitle>
               </CardHeader>
-              <CardContent>
-                <form onSubmit={handleExtraSubmit} className="space-y-6">
+              <CardContent className="space-y-6">
+                <div className="space-y-2">
+                  <Label>Runs</Label>
+                  <RadioGroup
+                    value={runs}
+                    onValueChange={setRuns}
+                    className="grid grid-cols-7 gap-2"
+                  >
+                    {["0", "1", "2", "3", "4", "6"].map((value) => (
+                      <div key={value} className="flex items-center space-x-2">
+                        <RadioGroupItem
+                          value={value}
+                          id={`runs-${value}`}
+                          className="peer sr-only"
+                        />
+                        <Label
+                          htmlFor={`runs-${value}`}
+                          className="flex h-12 w-full cursor-pointer items-center justify-center rounded-md border-2 border-[#E5E5E5] bg-white text-sm font-medium peer-data-[state=checked]:border-[#800000] peer-data-[state=checked]:bg-[#800000] peer-data-[state=checked]:text-white [&:has([data-state=checked])]:border-[#800000]"
+                        >
+                          {value}
+                        </Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </div>
+
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label>Wicket</Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className={`h-12 w-full border-2 ${
+                        isWicket
+                          ? "border-red-500 bg-red-500 text-white hover:bg-red-600 hover:text-white"
+                          : "border-[#E5E5E5] bg-white text-[#1A1A1A] hover:bg-[#F5F5F5]"
+                      }`}
+                      onClick={() => setIsWicket(!isWicket)}
+                    >
+                      Wicket
+                    </Button>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Extra</Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className={`h-12 w-full border-2 ${
+                        isExtra
+                          ? "border-yellow-500 bg-yellow-500 text-white hover:bg-yellow-600 hover:text-white"
+                          : "border-[#E5E5E5] bg-white text-[#1A1A1A] hover:bg-[#F5F5F5]"
+                      }`}
+                      onClick={() => setIsExtra(!isExtra)}
+                    >
+                      Extra
+                    </Button>
+                  </div>
+                </div>
+
+                {isExtra && (
                   <div className="space-y-2">
                     <Label>Extra Type</Label>
-                    <RadioGroup value={extraType} onValueChange={setExtraType} className="grid grid-cols-2 gap-4 pt-2">
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="wide" id="wide" className="border-gray-600" />
-                        <Label htmlFor="wide" className="font-normal">
-                          Wide
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="no-ball" id="no-ball" className="border-gray-600" />
-                        <Label htmlFor="no-ball" className="font-normal">
-                          No Ball
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="bye" id="bye" className="border-gray-600" />
-                        <Label htmlFor="bye" className="font-normal">
-                          Bye
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="leg-bye" id="leg-bye" className="border-gray-600" />
-                        <Label htmlFor="leg-bye" className="font-normal">
-                          Leg Bye
-                        </Label>
-                      </div>
-                    </RadioGroup>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="extra-runs">Runs</Label>
-                    <div className="flex items-center space-x-2">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        className="h-8 w-8 border-gray-700"
-                        onClick={() => setExtraRuns(Math.max(1, extraRuns - 1))}
-                      >
-                        <Minus className="h-4 w-4" />
-                      </Button>
-                      <Input
-                        id="extra-runs"
-                        type="number"
-                        value={extraRuns}
-                        onChange={(e) => setExtraRuns(Number.parseInt(e.target.value) || 1)}
-                        min="1"
-                        max="5"
-                        className="bg-gray-800 border-gray-700 text-center"
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        className="h-8 w-8 border-gray-700"
-                        onClick={() => setExtraRuns(Math.min(5, extraRuns + 1))}
-                      >
-                        <Plus className="h-4 w-4" />
-                      </Button>
+                    <div className="grid grid-cols-4 gap-2">
+                      {["Wide", "No Ball", "Bye", "Leg Bye"].map((type) => (
+                        <Button
+                          key={type}
+                          type="button"
+                          variant="outline"
+                          className={`h-12 w-full border-2 ${
+                            extraType === type.toLowerCase()
+                              ? "border-yellow-500 bg-yellow-500 text-white hover:bg-yellow-600 hover:text-white"
+                              : "border-[#E5E5E5] bg-white text-[#1A1A1A] hover:bg-[#F5F5F5]"
+                          }`}
+                          onClick={() =>
+                            setExtraType(
+                              extraType === type.toLowerCase()
+                                ? ""
+                                : type.toLowerCase()
+                            )
+                          }
+                        >
+                          {type}
+                        </Button>
+                      ))}
                     </div>
                   </div>
+                )}
 
-                  <div className="flex justify-end">
-                    <Button type="submit" className="bg-maroon-600 hover:bg-maroon-700">
-                      <Save className="h-4 w-4 mr-2" />
-                      Save Extras
-                    </Button>
+                {isWicket && (
+                  <div className="space-y-2">
+                    <Label>Dismissal Type</Label>
+                    <div className="grid grid-cols-4 gap-2">
+                      {["Bowled", "Caught", "LBW", "Run Out"].map((type) => (
+                        <Button
+                          key={type}
+                          type="button"
+                          variant="outline"
+                          className={`h-12 w-full border-2 ${
+                            dismissalType === type.toLowerCase()
+                              ? "border-red-500 bg-red-500 text-white hover:bg-red-600 hover:text-white"
+                              : "border-[#E5E5E5] bg-white text-[#1A1A1A] hover:bg-[#F5F5F5]"
+                          }`}
+                          onClick={() =>
+                            setDismissalType(
+                              dismissalType === type.toLowerCase()
+                                ? ""
+                                : type.toLowerCase()
+                            )
+                          }
+                        >
+                          {type}
+                        </Button>
+                      ))}
+                    </div>
+                    <div>
+                      <Label htmlFor="nonStriker">Non-Striker</Label>
+
+                      <Select
+                        value={lossBatsman}
+                        onValueChange={setLossBatsman}
+                      >
+                        <SelectTrigger
+                          id="battingTeam"
+                          className="bg-white border-[#E5E5E5]"
+                        >
+                          <SelectValue placeholder="Select Batting Team" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {striker && nonStriker && (
+                            <>
+                              <SelectItem key={striker} value={striker}>
+                                {team1 &&
+                                  team2 &&
+                                  (battingTeam == "team1"
+                                    ? team1[striker]
+                                    : team2[striker])}
+                              </SelectItem>
+                              <SelectItem key={nonStriker} value={nonStriker}>
+                                {team1 &&
+                                  team2 &&
+                                  (battingTeam == "team1"
+                                    ? team1[nonStriker]
+                                    : team2[nonStriker])}
+                              </SelectItem>
+                            </>
+                          )}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
-                </form>
+                )}
+
+                <div className="space-y-2">
+                  <Label htmlFor="comment">Comment (Optional)</Label>
+                  <Textarea
+                    id="comment"
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    placeholder="Add any additional notes..."
+                    className="bg-white border-[#E5E5E5]"
+                  />
+                </div>
               </CardContent>
             </Card>
-          </TabsContent>
-        </Tabs>
-      </main>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 border-t border-gray-800 py-8 mt-12">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="mb-4 md:mb-0">
-              <p className="text-gray-400">© 2025 TMPL 2.0 - All rights reserved</p>
+            {/* Action Buttons */}
+            <div className="flex gap-4">
+              <Button
+                type="button"
+                variant="outline"
+                className="flex-1 border-[#E5E5E5] text-[#666666] hover:bg-[#F5F5F5]"
+                onClick={handleUndo}
+              >
+                <Undo2 className="h-4 w-4 mr-2" />
+                Undo Last Ball
+              </Button>
+              <Button
+                type="submit"
+                className="flex-1 bg-[#800000] hover:bg-[#600000] text-white"
+              >
+                <Save className="h-4 w-4 mr-2" />
+                Submit Ball
+              </Button>
             </div>
-            <div className="flex space-x-6">
-              <Link href="/" className="text-gray-400 hover:text-maroon-500 transition-colors">
-                Home
-              </Link>
-              <Link href="/live-scores" className="text-gray-400 hover:text-maroon-500 transition-colors">
-                Live Scores
-              </Link>
-              <Link href="/#about" className="text-gray-400 hover:text-maroon-500 transition-colors">
-                About
-              </Link>
-              <Link href="/#organizers" className="text-gray-400 hover:text-maroon-500 transition-colors">
-                Organizers
-              </Link>
-            </div>
-          </div>
-        </div>
-      </footer>
-    </div>
-  )
+          </form>
+        </main>
+      </div>
+    )
+  );
 }

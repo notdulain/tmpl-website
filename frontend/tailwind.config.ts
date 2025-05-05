@@ -19,6 +19,9 @@ const config = {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ['Poppins', 'sans-serif'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -53,20 +56,20 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // Custom colors for TMPL 2.0
+        // TMPL Color Palette
         maroon: {
-          500: "#800020",
-          600: "#6a001a",
-          700: "#550015",
+          500: "#800000",
+          600: "#6a0000",
+          700: "#550000",
         },
-        yellow: {
-          300: "#ffd700",
-          400: "#e6c200",
+        charcoal: {
+          500: "#2E2E2E",
+          400: "#4E4E4E",
+          300: "#6E6E6E",
         },
-        navy: {
-          500: "#000080",
-          600: "#00006a",
-          700: "#000055",
+        light: {
+          grey: "#F9F9F9",
+          white: "#FFFFFF",
         },
       },
       borderRadius: {
