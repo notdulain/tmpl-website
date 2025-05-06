@@ -119,6 +119,13 @@ export default function Matches() {
         >
           Create Match
         </button>
+        <button
+          type="button"
+          onClick={() => router.push('/admin/register')}
+          className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200 mt-2"
+        >
+          Register a new team
+        </button>
       </form>
     </div>
   );

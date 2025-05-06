@@ -4,6 +4,11 @@ import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import { app } from "@/lib/firebase";
 import { getDatabase, ref, set } from "firebase/database";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { ArrowLeft } from "lucide-react";
 
 interface TeamProps {
   name: string;
@@ -20,6 +25,8 @@ interface TeamProps {
 export default function Register() {
   const db = getDatabase(app);
   const router = useRouter();
+  const auth = getAuth(app);
+  const [authState, setAuthState] = useState(false);
 
   const [teamData, setTeamData] = useState<TeamProps>({
     name: "",
@@ -44,119 +51,129 @@ export default function Register() {
     if (teamId) {
       const refference = ref(db, `teams/${teamId}`);
       set(refference, teamData);
-      router.push("/admin");
+      // Clear the form
+      setTeamId(null);
+      setTeamData({
+        name: "",
+        member1: "",
+        member2: "",
+        member3: "",
+        member4: "",
+        member5: "",
+        member6: "",
+        member7: "",
+        member8: "",
+      });
+      alert("Team registered successfully!");
     } else {
-      console.log("Set a team Id");
+      alert("Please enter a Team ID");
     }
   };
+
+  const logOut = () => {
+    signOut(auth)
+      .then(() => {
+        router.push("/admin/score-entry");
+        console.log("Signed out successfully");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   return (
-    <div className="max-w-xl mx-auto bg-white p-6 rounded-2xl shadow-md">
-      <h2 className="text-2xl font-bold mb-4 text-center">Team Registration</h2>
-
-      <form
-        className="space-y-4"
-        onSubmit={(e) => {
-          e.preventDefault();
-        }}
-      >
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Team Id
-          </label>
-          <input
-            type="text"
-            name="teamId"
-            placeholder="Enter team name"
-            className="block w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2"
-            onChange={(e) => {
-              setTeamId(e.target.value);
-            }}
-          />
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Team Name
-          </label>
-          <input
-            type="text"
-            name="name"
-            placeholder="Enter team name"
-            className="block w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2"
-            onChange={handleChange}
-          />
-        </div>
-
-        <div>
-          <h3 className="text-lg font-semibold mb-2">Team Members</h3>
-
-          <div className="space-y-2">
-            <input
-              type="text"
-              name="member1"
-              placeholder="Member 1 Name"
-              className="w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2"
-              onChange={handleChange}
-            />
-            <input
-              type="text"
-              name="member2"
-              placeholder="Member 2 Name"
-              className="w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2"
-              onChange={handleChange}
-            />
-            <input
-              type="text"
-              name="member3"
-              placeholder="Member 3 Name"
-              className="w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2"
-              onChange={handleChange}
-            />
-            <input
-              type="text"
-              name="member4"
-              placeholder="Member 4 Name"
-              className="w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2"
-              onChange={handleChange}
-            />
-            <input
-              type="text"
-              name="member5"
-              placeholder="Member 5 Name"
-              className="w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2"
-              onChange={handleChange}
-            />
-            <input
-              type="text"
-              name="member6"
-              placeholder="Member 6 Name"
-              className="w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2"
-              onChange={handleChange}
-            />
-            <input
-              type="text"
-              name="member7"
-              placeholder="Member 7 Name"
-              className="w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2"
-              onChange={handleChange}
-            />
-            <input
-              type="text"
-              name="member8"
-              placeholder="Member 8 Name"
-              className="w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2"
-              onChange={handleChange}
-            />
+    <div className="min-h-screen bg-[#FAF8F5]">
+      {/* Header */}
+      <header className="bg-white border-b border-[#E5E5E5] sticky top-0 z-50">
+        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="cursor-pointer"
+              onClick={() => router.push('/admin/score-entry')}
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <div>
+              <h1 className="text-xl font-bold text-[#1A1A1A]">
+                Team Registration
+              </h1>
+              <p className="text-sm text-[#666666]">
+                TMPL 2.0 - Register New Team
+              </p>
+            </div>
           </div>
         </div>
+      </header>
 
-        <div className="text-center">
-          <button
-            type="submit"
-            className="bg-indigo-600 text-white px-6 py-2 rounded-xl hover:bg-indigo-700 transition"
-            onClick={handelSubmit}
-          >
-            Submit
-          </button>
-        </div>
-      </form>
+      {/* Main Content */}
+      <main className="max-w-4xl mx-auto px-6 py-8">
+        <Card className="bg-white border-[#E5E5E5]">
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold text-[#1A1A1A]">
+              Team Details
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              handelSubmit();
+            }}>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="teamId">Team ID</Label>
+                  <Input
+                    id="teamId"
+                    type="text"
+                    placeholder="Enter team ID"
+                    className="bg-white border-[#E5E5E5]"
+                    value={teamId || ''}
+                    onChange={(e) => setTeamId(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="name">Team Name</Label>
+                  <Input
+                    id="name"
+                    name="name"
+                    type="text"
+                    placeholder="Enter team name"
+                    className="bg-white border-[#E5E5E5]"
+                    value={teamData.name}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-4 mt-6">
+                <h3 className="text-lg font-semibold text-[#1A1A1A]">Team Members</h3>
+                {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
+                  <div key={num}>
+                    <Label htmlFor={`member${num}`}>Member {num}</Label>
+                    <Input
+                      id={`member${num}`}
+                      name={`member${num}`}
+                      type="text"
+                      placeholder={`Enter member ${num} name`}
+                      className="bg-white border-[#E5E5E5]"
+                      value={teamData[`member${num}` as keyof TeamProps]}
+                      onChange={handleChange}
+                    />
+                  </div>
+                ))}
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full bg-[#800000] hover:bg-[#600000] text-white mt-6"
+              >
+                Register Team
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </main>
     </div>
   );
 }
