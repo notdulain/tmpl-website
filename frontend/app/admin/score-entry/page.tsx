@@ -862,6 +862,13 @@ export default function ScoreEntry() {
           >
             Register a new team
           </Button>
+          <Button
+            variant="outline"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white mt-4"
+            onClick={() => router.push('/admin/matches')}
+          >
+            Create a match
+          </Button>
         </main>
       </div>
     )

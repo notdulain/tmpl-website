@@ -4,6 +4,18 @@ import { get, getDatabase, ref, set } from "firebase/database";
 import { FormEvent, useEffect, useState } from "react";
 import { app } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { ArrowLeft } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface MatchProp {
   team1: string;
@@ -17,35 +29,44 @@ export default function Matches() {
   const db = getDatabase(app);
   const router = useRouter();
   const [teams, setTeams] = useState<string[] | null>(null);
+  const [selectedTeam1, setSelectedTeam1] = useState<string>("");
+  const [selectedTeam2, setSelectedTeam2] = useState<string>("");
 
   useEffect(() => {
     const fetchData = async () => {
-      const dbRef = ref(db, "teams/");
-      const snapshot = await get(dbRef);
-      if (snapshot.exists()) {
-        // Get only the keys
-        const data = snapshot.val();
-        const keys = Object.keys(data);
-        setTeams(keys);
-      } else {
-        console.log("doesn't founds");
+      try {
+        const dbRef = ref(db, "teams/");
+        const snapshot = await get(dbRef);
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          const keys = Object.keys(data);
+          console.log("Fetched teams:", keys); // Debug log
+          setTeams(keys);
+        } else {
+          console.log("No teams found in database");
+        }
+      } catch (error) {
+        console.error("Error fetching teams:", error);
       }
     };
     fetchData();
-  }, []);
+  }, [db]); // Added db as dependency
 
   const handelSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const form = e.currentTarget;
     const formData = new FormData(form);
-    const team1 = formData.get("team1") as string;
-    const team2 = formData.get("team2") as string;
     const mathId = formData.get("matchId") as string;
 
+    if (!selectedTeam1 || !selectedTeam2) {
+      alert("Please select both teams");
+      return;
+    }
+
     const matchData: MatchProp = {
-      team1: team1,
-      team2: team2,
+      team1: selectedTeam1,
+      team2: selectedTeam2,
       status: "pending",
       toss: "pending",
       tossDecision: "pending",
@@ -54,79 +75,124 @@ export default function Matches() {
     if (mathId) {
       const refference = ref(db, `matches/${mathId}`);
       set(refference, matchData);
-      router.push("/admin");
+      // Clear the form
+      form.reset();
+      setSelectedTeam1("");
+      setSelectedTeam2("");
+      alert("Match created successfully!");
     } else {
-      console.log("Set a team Id");
+      alert("Please enter a Match ID");
     }
   };
+
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-lg w-full max-w-md">
-      <h2 className="text-2xl font-bold text-gray-800 mb-4">Create a Match</h2>
-      <form className="space-y-4" onSubmit={handelSubmit}>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Match ID
-          </label>
-          <input
-            id="matchId"
-            type="text"
-            name="matchId"
-            placeholder="Enter Match ID"
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+    <div className="min-h-screen bg-[#FAF8F5]">
+      {/* Header */}
+      <header className="bg-white border-b border-[#E5E5E5] sticky top-0 z-50">
+        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="cursor-pointer"
+              onClick={() => router.push('/admin/score-entry')}
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <div>
+              <h1 className="text-xl font-bold text-[#1A1A1A]">
+                Create a Match
+              </h1>
+              <p className="text-sm text-[#666666]">
+                TMPL 2.0 - New Match
+              </p>
+            </div>
+          </div>
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Team 1
-          </label>
-          <select
-            id="team1"
-            name="team1"
-            required
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">Select a Team</option>
-            {teams &&
-              teams.map((key) => (
-                <option key={key} value={key}>
-                  {key}
-                </option>
-              ))}
-          </select>
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Team 2
-          </label>
-          <select
-            id="team2"
-            name="team2"
-            required
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">Select a Team</option>
-            {teams &&
-              teams.map((key) => (
-                <option key={key} value={key}>
-                  {key}
-                </option>
-              ))}
-          </select>
-        </div>
-        <button
-          type="submit"
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200"
-        >
-          Create Match
-        </button>
-        <button
-          type="button"
-          onClick={() => router.push('/admin/register')}
-          className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200 mt-2"
-        >
-          Register a new team
-        </button>
-      </form>
+      </header>
+
+      {/* Main Content */}
+      <main className="max-w-4xl mx-auto px-6 py-8">
+        <Card className="bg-white border-[#E5E5E5]">
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold text-[#1A1A1A]">
+              Match Details
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form className="space-y-6" onSubmit={handelSubmit}>
+              <div>
+                <Label htmlFor="matchId">Match ID</Label>
+                <Input
+                  id="matchId"
+                  type="text"
+                  name="matchId"
+                  placeholder="Enter Match ID"
+                  className="bg-white border-[#E5E5E5]"
+                />
+              </div>
+              <div>
+                <Label htmlFor="team1">Team 1</Label>
+                <Select 
+                  name="team1" 
+                  required 
+                  value={selectedTeam1}
+                  onValueChange={setSelectedTeam1}
+                >
+                  <SelectTrigger className="bg-white border-[#E5E5E5]">
+                    <SelectValue placeholder="Select a Team" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {teams ? (
+                      teams.map((team) => (
+                        <SelectItem key={team} value={team}>
+                          {team}
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <SelectItem value="loading" disabled>
+                        Loading teams...
+                      </SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="team2">Team 2</Label>
+                <Select 
+                  name="team2" 
+                  required 
+                  value={selectedTeam2}
+                  onValueChange={setSelectedTeam2}
+                >
+                  <SelectTrigger className="bg-white border-[#E5E5E5]">
+                    <SelectValue placeholder="Select a Team" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {teams ? (
+                      teams.map((team) => (
+                        <SelectItem key={team} value={team}>
+                          {team}
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <SelectItem value="loading" disabled>
+                        Loading teams...
+                      </SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button
+                type="submit"
+                className="w-full bg-[#800000] hover:bg-[#600000] text-white"
+              >
+                Create Match
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </main>
     </div>
   );
 }
