@@ -52,9 +52,28 @@ interface TeamProps {
   member8: string;
 }
 
+const styles = `
+  @keyframes pulse-slow {
+    0% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+
+  .animate-pulse-slow {
+    animation: pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+`;
+
 export default function LiveScores() {
   const database = getDatabase(app);
   const [matches, setMatches] = useState<MatchProp[]>();
+  const [teamNames, setTeamNames] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const dataRef = ref(database, "matches/");
@@ -65,41 +84,44 @@ export default function LiveScores() {
     });
   }, []);
 
-  // useEffect(() => {
-  //   const fetchTeams = async () => {
-  //     const updated = await updateMatches();
-  //     setMatches(updated);
-  //     console.log(updated);
-  //   };
-  //   fetchTeams();
-  // }, [matches]);
+  useEffect(() => {
+    const fetchTeamNames = async () => {
+      if (matches) {
+        const names: Record<string, string> = {};
+        const uniqueTeamIds = new Set<string>();
+        
+        // Collect all unique team IDs
+        Object.values(matches).forEach(match => {
+          uniqueTeamIds.add(match.team1);
+          uniqueTeamIds.add(match.team2);
+        });
 
-  // const updateMatches = async () => {
-  //   // Wait for all match updates to complete
-  //   if (matches) {
-  //     await Promise.all(
-  //       Object.values(matches).map(async (match) => {
-  //         const team1 = await fetchTeam(match.team1);
-  //         const team2 = await fetchTeam(match.team2);
+        // Fetch team data for each unique team ID
+        for (const teamId of uniqueTeamIds) {
+          const teamRef = ref(database, `teams/${teamId}`);
+          const snapshot = await get(teamRef);
+          if (snapshot.exists()) {
+            const teamData = snapshot.val();
+            names[teamId] = teamData.name;
+          }
+        }
+        
+        setTeamNames(names);
+      }
+    };
 
-  //         match.innings.forEach((inning) => {
-  //           if (inning.battingTeam == match.team1) {
-  //             inning.batsman1 = team1?.[inning.batsman1] ?? "";
-  //             inning.batsman2 = team1?.[inning.batsman2] ?? "";
-  //             inning.bowler = team2?.[inning.bowler] ?? "";
-  //           } else {
-  //             inning.batsman1 = team2?.[inning.batsman1] ?? "";
-  //             inning.batsman2 = team2?.[inning.batsman2] ?? "";
-  //             inning.bowler = team1?.[inning.bowler] ?? "";
-  //           }
-  //         });
-  //       })
-  //     );
-  //   }
+    fetchTeamNames();
+  }, [matches, database]);
 
-  //   // Now matches is fully updated
-  //   return matches;
-  // };
+  useEffect(() => {
+    const styleSheet = document.createElement("style");
+    styleSheet.textContent = styles;
+    document.head.appendChild(styleSheet);
+
+    return () => {
+      document.head.removeChild(styleSheet);
+    };
+  }, []);
 
   const fetchTeam = async (teamId: string): Promise<TeamProps | null> => {
     const dbRef = ref(database, `teams/${teamId}`);
@@ -279,7 +301,7 @@ export default function LiveScores() {
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <Badge className="bg-[#800000] text-white text-xs md:text-sm">
+                        <Badge className="bg-green-500 text-white text-xs md:text-sm animate-pulse-slow">
                           LIVE
                         </Badge>
                         <Badge
@@ -290,7 +312,7 @@ export default function LiveScores() {
                         </Badge>
                       </div>
                       <h1 className="text-lg md:text-2xl font-bold">
-                        {match.team1} vs {match.team2}
+                        {teamNames[match.team1] || match.team1} vs {teamNames[match.team2] || match.team2}
                       </h1>
                     </div>
                     <Badge
@@ -530,7 +552,7 @@ export default function LiveScores() {
                       <div className="space-y-2">
                         <div className="flex justify-between items-center">
                           <div className="flex-1">
-                            <div className="font-medium">{match.team1}</div>
+                            <div className="font-medium">{teamNames[match.team1] || match.team1}</div>
                             <div className="text-sm text-[#666666]">
                               {match.innings && match.innings[1] ? `${Math.floor(match.innings[1].overs / 4)}.${match.innings[1].overs % 4}` : '0.0'} overs
                             </div>
@@ -543,7 +565,7 @@ export default function LiveScores() {
                         </div>
                         <div className="flex justify-between items-center">
                           <div className="flex-1">
-                            <div className="font-medium">{match.team2}</div>
+                            <div className="font-medium">{teamNames[match.team2] || match.team2}</div>
                             <div className="text-sm text-[#666666]">
                               {match.innings && match.innings[2] ? `${Math.floor(match.innings[2].overs / 4)}.${match.innings[2].overs % 4}` : '0.0'} overs
                             </div>
