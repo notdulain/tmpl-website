@@ -48,7 +48,7 @@ interface MathcProps {
   team1: string;
   team2: string;
   toss: string;
-  tossDecisiton: String;
+  tossDecision: string;
 }
 
 interface InningDataProps {
@@ -79,6 +79,8 @@ export default function ScoreEntry() {
     null
   );
   const [selectedMatch, setSelectedMatch] = useState<string>();
+  const [tossWinner, setTossWinner] = useState<string>("");
+  const [tossDecision, setTossDecision] = useState<string>("");
 
   const [team1, setTeam1] = useState<TeamProps | null>();
   const [team2, setTeam2] = useState<TeamProps | null>();
@@ -404,6 +406,17 @@ export default function ScoreEntry() {
     alert("Last ball undone!");
   };
 
+  // Update toss information when match changes
+  useEffect(() => {
+    if (matches && selectedMatch) {
+      setTossWinner(matches[selectedMatch].toss || "");
+      setTossDecision(matches[selectedMatch].tossDecision || "");
+    } else {
+      setTossWinner("");
+      setTossDecision("");
+    }
+  }, [selectedMatch, matches]);
+
   return (
     authState && (
       <div className="min-h-screen bg-[#FAF8F5]">
@@ -518,6 +531,79 @@ export default function ScoreEntry() {
                       </span>
                     </label>
                   </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Toss Information Card */}
+            <Card className="bg-white border-[#E5E5E5]">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-[#1A1A1A]">
+                  Toss Information
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="grid grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label>Toss Winner</Label>
+                  <Select 
+                    value={tossWinner}
+                    onValueChange={(value) => {
+                      if (matches && selectedMatch) {
+                        const matchData = { ...matches[selectedMatch] };
+                        matchData.toss = value;
+                        setTossWinner(value);
+                        const refference = ref(db, `matches/${selectedMatch}`);
+                        set(refference, matchData);
+                      }
+                    }}
+                  >
+                    <SelectTrigger className="bg-white border-[#E5E5E5]">
+                      <SelectValue placeholder="Select toss winner">
+                        {tossWinner === "team1" && matches && selectedMatch ? matches[selectedMatch].team1 : 
+                         tossWinner === "team2" && matches && selectedMatch ? matches[selectedMatch].team2 : 
+                         "Select toss winner"}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {matches && selectedMatch && (
+                        <>
+                          <SelectItem value={matches[selectedMatch].team1}>
+                            {matches[selectedMatch].team1}
+                          </SelectItem>
+                          <SelectItem value={matches[selectedMatch].team2}>
+                            {matches[selectedMatch].team2}
+                          </SelectItem>
+                        </>
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Toss Decision</Label>
+                  <Select 
+                    value={tossDecision}
+                    onValueChange={(value) => {
+                      if (matches && selectedMatch) {
+                        const matchData = { ...matches[selectedMatch] };
+                        matchData.tossDecision = value;
+                        setTossDecision(value);
+                        const refference = ref(db, `matches/${selectedMatch}`);
+                        set(refference, matchData);
+                      }
+                    }}
+                  >
+                    <SelectTrigger className="bg-white border-[#E5E5E5]">
+                      <SelectValue placeholder="Select toss decision">
+                        {tossDecision === "bat" ? "Bat" : 
+                         tossDecision === "bowl" ? "Bowl" : 
+                         "Select toss decision"}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="bat">Bat</SelectItem>
+                      <SelectItem value="bowl">Bowl</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </CardContent>
             </Card>
