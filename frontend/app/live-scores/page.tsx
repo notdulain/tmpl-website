@@ -532,12 +532,12 @@ export default function LiveScores() {
                           <div className="flex-1">
                             <div className="font-medium">{match.team1}</div>
                             <div className="text-sm text-[#666666]">
-                              {match.innings[1].overs} overs
+                              {match.innings && match.innings[1] ? `${Math.floor(match.innings[1].overs / 4)}.${match.innings[1].overs % 4}` : '0.0'} overs
                             </div>
                           </div>
                           <div className="text-right">
                             <div className="font-bold text-[#800000]">
-                              {match.innings[1].runs}/{match.innings[1].wickets}
+                              {match.innings && match.innings[1] ? `${match.innings[1].runs}/${match.innings[1].wickets}` : '0/0'}
                             </div>
                           </div>
                         </div>
@@ -545,12 +545,12 @@ export default function LiveScores() {
                           <div className="flex-1">
                             <div className="font-medium">{match.team2}</div>
                             <div className="text-sm text-[#666666]">
-                              {match.innings[2].overs} overs
+                              {match.innings && match.innings[2] ? `${Math.floor(match.innings[2].overs / 4)}.${match.innings[2].overs % 4}` : '0.0'} overs
                             </div>
                           </div>
                           <div className="text-right">
                             <div className="font-bold text-[#800000]">
-                              {match.innings[2].runs}/{match.innings[2].overs}
+                              {match.innings && match.innings[2] ? `${match.innings[2].runs}/${match.innings[2].wickets}` : '0/0'}
                             </div>
                           </div>
                         </div>
