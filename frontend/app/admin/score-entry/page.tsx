@@ -27,7 +27,7 @@ import {
 import { useRouter } from "next/navigation";
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import { app } from "@/lib/firebase";
-import { get, getDatabase, ref, set } from "firebase/database";
+import { get, getDatabase, ref, set, update } from "firebase/database";
 import { run } from "node:test";
 import {
   Dialog,
@@ -36,55 +36,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 
-interface TeamProps {
-  [key: string]: string;
-  name: string;
-  member1: string;
-  member2: string;
-  member3: string;
-  member4: string;
-  member5: string;
-  member6: string;
-  member7: string;
-  member8: string;
-}
-
-interface MathcProps {
-  status: string;
-  team1: string;
-  team2: string;
-  toss: string;
-  tossDecision: string;
-}
-
-interface InningDataProps {
-  battingTeam: string;
-  runs: number;
-  wickets: number;
-  overs: number;
-  stricker: string;
-  batsman1: string;
-  batsman2: string;
-  batsman1Runs: number;
-  batsman1Balls: number;
-  batsman2Runs: number;
-  batsman2Balls: number;
-  bowler: string;
-  wides: number;
-  noBals: number;
-  byes: number;
-  legByes: number;
-  completed: boolean;
-  recentDeliveries: string[];
-}
+import { MatchProp, TeamProps, InningDataProps } from "@/app/types/interfaces";
 
 export default function ScoreEntry() {
   const router = useRouter();
   const auth = getAuth(app);
   const [authState, setAuthState] = useState(false);
-  const [matches, setMatches] = useState<Record<string, MathcProps> | null>(
+  const [matches, setMatches] = useState<Record<string, MatchProp> | null>(
     null
   );
   const [selectedMatch, setSelectedMatch] = useState<string>();
@@ -165,19 +125,18 @@ export default function ScoreEntry() {
   }, [selectedMatch]);
 
   useEffect(() => {
+    console.log("hellos");
     if (isLive) {
       if (matches && matches[selectedMatch as string].status != "live") {
-        const matchData = matches[selectedMatch as string];
         const refference = ref(db, `matches/${selectedMatch}`);
-        matchData.status = "live";
-        set(refference, matchData);
+        update(refference, { status: "live" });
+        matches[selectedMatch as string].status = "live";
       }
     } else {
       if (matches && matches[selectedMatch as string].status == "live") {
-        const matchData = matches[selectedMatch as string];
         const refference = ref(db, `matches/${selectedMatch}`);
-        matchData.status = "pending";
-        set(refference, matchData);
+        update(refference, { status: "pending" });
+        matches[selectedMatch as string].status = "pending";
       }
     }
   }, [isLive]);
@@ -391,7 +350,10 @@ export default function ScoreEntry() {
         ballResult = "NB";
       }
     }
-    data.recentDeliveries = [...(data.recentDeliveries || []), ballResult.toString()].slice(-20); // Keep last 20 balls
+    data.recentDeliveries = [
+      ...(data.recentDeliveries || []),
+      ballResult.toString(),
+    ].slice(-20); // Keep last 20 balls
 
     if (striker == inningData.batsman1) {
       data.batsman1Balls = inningData.batsman1Balls + 1;
@@ -411,14 +373,14 @@ export default function ScoreEntry() {
     if (selectedMatch && inning != "") {
       const refference = ref(db, `matches/${selectedMatch}/innings/${inning}`);
       await set(refference, data);
-      
+
       // Show success message using SweetAlert2
       Swal.fire({
-        title: 'Ball Submitted Successfully!',
-        text: 'The ball has been recorded and the score has been updated.',
-        icon: 'success',
-        confirmButtonColor: '#800000',
-        confirmButtonText: 'Continue'
+        title: "Ball Submitted Successfully!",
+        text: "The ball has been recorded and the score has been updated.",
+        icon: "success",
+        confirmButtonColor: "#800000",
+        confirmButtonText: "Continue",
       });
 
       // Reset form fields
@@ -651,7 +613,7 @@ export default function ScoreEntry() {
               <CardContent className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label>Toss Winner</Label>
-                  <Select 
+                  <Select
                     value={tossWinner}
                     onValueChange={(value) => {
                       if (matches && selectedMatch) {
@@ -665,9 +627,11 @@ export default function ScoreEntry() {
                   >
                     <SelectTrigger className="bg-white border-[#E5E5E5]">
                       <SelectValue placeholder="Select toss winner">
-                        {tossWinner === "team1" && matches && selectedMatch ? matches[selectedMatch].team1 : 
-                         tossWinner === "team2" && matches && selectedMatch ? matches[selectedMatch].team2 : 
-                         "Select toss winner"}
+                        {tossWinner === "team1" && matches && selectedMatch
+                          ? matches[selectedMatch].team1
+                          : tossWinner === "team2" && matches && selectedMatch
+                          ? matches[selectedMatch].team2
+                          : "Select toss winner"}
                       </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
@@ -686,7 +650,7 @@ export default function ScoreEntry() {
                 </div>
                 <div className="space-y-2">
                   <Label>Toss Decision</Label>
-                  <Select 
+                  <Select
                     value={tossDecision}
                     onValueChange={(value) => {
                       if (matches && selectedMatch) {
@@ -700,9 +664,11 @@ export default function ScoreEntry() {
                   >
                     <SelectTrigger className="bg-white border-[#E5E5E5]">
                       <SelectValue placeholder="Select toss decision">
-                        {tossDecision === "bat" ? "Bat" : 
-                         tossDecision === "bowl" ? "Bowl" : 
-                         "Select toss decision"}
+                        {tossDecision === "bat"
+                          ? "Bat"
+                          : tossDecision === "bowl"
+                          ? "Bowl"
+                          : "Select toss decision"}
                       </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
@@ -977,7 +943,9 @@ export default function ScoreEntry() {
                       ))}
                     </div>
                     <div>
-                      <Label htmlFor="dismissedBatsman">Dismissed Batsman</Label>
+                      <Label htmlFor="dismissedBatsman">
+                        Dismissed Batsman
+                      </Label>
 
                       <Select
                         value={lossBatsman}
@@ -1050,14 +1018,14 @@ export default function ScoreEntry() {
           <Button
             variant="outline"
             className="w-full bg-green-600 hover:bg-green-700 text-white mt-4"
-            onClick={() => router.push('/admin/register')}
+            onClick={() => router.push("/admin/register")}
           >
             Register a new team
           </Button>
           <Button
             variant="outline"
             className="w-full bg-blue-600 hover:bg-blue-700 text-white mt-4"
-            onClick={() => router.push('/admin/matches')}
+            onClick={() => router.push("/admin/matches")}
           >
             Create a match
           </Button>
@@ -1071,7 +1039,8 @@ export default function ScoreEntry() {
                 Undo Last Ball
               </DialogTitle>
               <DialogDescription className="text-center text-gray-600">
-                Are you sure you want to undo the last ball? This action cannot be reversed.
+                Are you sure you want to undo the last ball? This action cannot
+                be reversed.
               </DialogDescription>
             </DialogHeader>
             <div className="flex justify-center gap-4 mt-4">

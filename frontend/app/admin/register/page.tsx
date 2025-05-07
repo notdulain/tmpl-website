@@ -10,17 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft } from "lucide-react";
 
-interface TeamProps {
-  name: string;
-  member1: string;
-  member2: string;
-  member3: string;
-  member4: string;
-  member5: string;
-  member6: string;
-  member7: string;
-  member8: string;
-}
+import { TeamProps } from "@/app/types/interfaces";
 
 export default function Register() {
   const db = getDatabase(app);
@@ -91,7 +81,7 @@ export default function Register() {
               variant="ghost"
               size="icon"
               className="cursor-pointer"
-              onClick={() => router.push('/admin/score-entry')}
+              onClick={() => router.push("/admin/score-entry")}
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
@@ -116,10 +106,12 @@ export default function Register() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              handelSubmit();
-            }}>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handelSubmit();
+              }}
+            >
               <div className="space-y-4">
                 <div>
                   <Label htmlFor="teamId">Team ID</Label>
@@ -128,7 +120,7 @@ export default function Register() {
                     type="text"
                     placeholder="Enter team ID"
                     className="bg-white border-[#E5E5E5]"
-                    value={teamId || ''}
+                    value={teamId || ""}
                     onChange={(e) => setTeamId(e.target.value)}
                   />
                 </div>
@@ -147,7 +139,9 @@ export default function Register() {
               </div>
 
               <div className="space-y-4 mt-6">
-                <h3 className="text-lg font-semibold text-[#1A1A1A]">Team Members</h3>
+                <h3 className="text-lg font-semibold text-[#1A1A1A]">
+                  Team Members
+                </h3>
                 {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
                   <div key={num}>
                     <Label htmlFor={`member${num}`}>Member {num}</Label>

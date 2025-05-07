@@ -17,13 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-interface MatchProp {
-  team1: string;
-  team2: string;
-  status: string;
-  toss: string;
-  tossDecision: string;
-}
+import { MatchProp, InningDataProps } from "@/app/types/interfaces";
 
 export default function Matches() {
   const db = getDatabase(app);
@@ -31,6 +25,7 @@ export default function Matches() {
   const [teams, setTeams] = useState<string[] | null>(null);
   const [selectedTeam1, setSelectedTeam1] = useState<string>("");
   const [selectedTeam2, setSelectedTeam2] = useState<string>("");
+  const [selectedGroup, setSeletectedGroup] = useState<string>("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -67,10 +62,13 @@ export default function Matches() {
     const matchData: MatchProp = {
       team1: selectedTeam1,
       team2: selectedTeam2,
+      group: selectedGroup,
       status: "pending",
       toss: "pending",
       tossDecision: "pending",
     };
+
+    console.log(matchData);
 
     if (mathId) {
       const refference = ref(db, `matches/${mathId}`);
@@ -95,7 +93,7 @@ export default function Matches() {
               variant="ghost"
               size="icon"
               className="cursor-pointer"
-              onClick={() => router.push('/admin/score-entry')}
+              onClick={() => router.push("/admin/score-entry")}
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
@@ -103,9 +101,7 @@ export default function Matches() {
               <h1 className="text-xl font-bold text-[#1A1A1A]">
                 Create a Match
               </h1>
-              <p className="text-sm text-[#666666]">
-                TMPL 2.0 - New Match
-              </p>
+              <p className="text-sm text-[#666666]">TMPL 2.0 - New Match</p>
             </div>
           </div>
         </div>
@@ -132,10 +128,31 @@ export default function Matches() {
                 />
               </div>
               <div>
+                <Label htmlFor="matchId">Group</Label>
+                <Select
+                  name="group"
+                  required
+                  value={selectedGroup}
+                  onValueChange={setSeletectedGroup}
+                >
+                  <SelectTrigger className="bg-white border-[#E5E5E5]">
+                    <SelectValue placeholder="Select a Team" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem key="GROUP A" value="GROUP A">
+                      GROUP A
+                    </SelectItem>
+                    <SelectItem key="GROUP B" value="GROUP B">
+                      GROUP B
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
                 <Label htmlFor="team1">Team 1</Label>
-                <Select 
-                  name="team1" 
-                  required 
+                <Select
+                  name="team1"
+                  required
                   value={selectedTeam1}
                   onValueChange={setSelectedTeam1}
                 >
@@ -159,9 +176,9 @@ export default function Matches() {
               </div>
               <div>
                 <Label htmlFor="team2">Team 2</Label>
-                <Select 
-                  name="team2" 
-                  required 
+                <Select
+                  name="team2"
+                  required
                   value={selectedTeam2}
                   onValueChange={setSelectedTeam2}
                 >
