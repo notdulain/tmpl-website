@@ -307,9 +307,12 @@ export default function LiveScores() {
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <Badge className="bg-green-500 text-white text-xs md:text-sm animate-pulse-slow">
-                          LIVE
-                        </Badge>
+                        <div className="relative">
+                          <div className="absolute inset-0 rounded-full bg-green-500 animate-ping opacity-75"></div>
+                          <Badge className="bg-green-500 text-white text-xs md:text-sm relative">
+                            LIVE
+                          </Badge>
+                        </div>
                         <Badge
                           variant="outline"
                           className="border-[#800000] text-[#800000] text-xs md:text-sm"
