@@ -1,6 +1,7 @@
 export interface MatchProp {
     team1: string;
     team2: string;
+    group: string;
     status: string;
     toss: string;
     tossDecision: string;

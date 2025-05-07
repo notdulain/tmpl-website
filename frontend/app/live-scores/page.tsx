@@ -34,6 +34,7 @@ interface InningDataProps {
 interface MatchProp {
   team1: string;
   team2: string;
+  group: string;
   status: string;
   toss: string;
   tossDecision: string;
@@ -314,7 +315,7 @@ export default function LiveScores() {
                           variant="outline"
                           className="border-[#800000] text-[#800000] text-xs md:text-sm"
                         >
-                          {liveMatch.stage}
+                          {match.group}
                         </Badge>
                       </div>
                       <h1 className="text-lg md:text-2xl font-bold">

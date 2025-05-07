@@ -25,6 +25,7 @@ export default function Matches() {
   const [teams, setTeams] = useState<string[] | null>(null);
   const [selectedTeam1, setSelectedTeam1] = useState<string>("");
   const [selectedTeam2, setSelectedTeam2] = useState<string>("");
+  const [selectedGroup, setSeletectedGroup] = useState<string>("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -61,10 +62,13 @@ export default function Matches() {
     const matchData: MatchProp = {
       team1: selectedTeam1,
       team2: selectedTeam2,
+      group: selectedGroup,
       status: "pending",
       toss: "pending",
       tossDecision: "pending",
     };
+
+    console.log(matchData);
 
     if (mathId) {
       const refference = ref(db, `matches/${mathId}`);
@@ -122,6 +126,27 @@ export default function Matches() {
                   placeholder="Enter Match ID"
                   className="bg-white border-[#E5E5E5]"
                 />
+              </div>
+              <div>
+                <Label htmlFor="matchId">Group</Label>
+                <Select
+                  name="group"
+                  required
+                  value={selectedGroup}
+                  onValueChange={setSeletectedGroup}
+                >
+                  <SelectTrigger className="bg-white border-[#E5E5E5]">
+                    <SelectValue placeholder="Select a Team" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem key="GROUP A" value="GROUP A">
+                      GROUP A
+                    </SelectItem>
+                    <SelectItem key="GROUP B" value="GROUP B">
+                      GROUP B
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <Label htmlFor="team1">Team 1</Label>
