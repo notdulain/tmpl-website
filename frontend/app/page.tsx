@@ -5,9 +5,11 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Trophy, Users, Calendar, ExternalLink, Menu, X } from "lucide-react"
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 
 export default function Home() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const router = useRouter()
 
   return (
     <div className="min-h-screen bg-light-white text-charcoal-500">
@@ -41,8 +43,9 @@ export default function Home() {
             <Button
               variant="outline"
               className="hidden md:flex border-maroon-500 text-maroon-500 hover:bg-maroon-500 hover:text-light-white"
+              onClick={() => router.push("/admin")}
             >
-              <Link href="/admin">Admin</Link>
+              Admin
             </Button>
             <Button 
               variant="ghost" 
@@ -101,8 +104,9 @@ export default function Home() {
               <Button
                 variant="outline"
                 className="border-maroon-500 text-maroon-500 hover:bg-maroon-500 hover:text-light-white mt-4"
+                onClick={() => router.push("/admin")}
               >
-                <Link href="/admin">Admin</Link>
+                Admin
               </Button>
             </nav>
           </div>

@@ -69,6 +69,7 @@ interface InningDataProps {
   byes: number;
   legByes: number;
   completed: boolean;
+  recentDeliveries: string[];
 }
 
 export default function ScoreEntry() {
@@ -117,6 +118,7 @@ export default function ScoreEntry() {
     byes: 0,
     legByes: 0,
     completed: false,
+    recentDeliveries: [],
   });
 
   useEffect(() => {
@@ -369,6 +371,19 @@ export default function ScoreEntry() {
     let data = inningData;
     data.runs = inningData.runs + Number(runs);
     data.overs = data.overs + 1;
+
+    // Add the ball to recentDeliveries
+    let ballResult = runs;
+    if (isWicket) {
+      ballResult = "W";
+    } else if (isExtra) {
+      if (extraType === "wide") {
+        ballResult = "WD";
+      } else if (extraType === "no ball") {
+        ballResult = "NB";
+      }
+    }
+    data.recentDeliveries = [...(data.recentDeliveries || []), ballResult.toString()].slice(-20); // Keep last 20 balls
 
     if (striker == inningData.batsman1) {
       data.batsman1Balls = inningData.batsman1Balls + 1;

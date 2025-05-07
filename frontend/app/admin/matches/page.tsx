@@ -144,8 +144,8 @@ export default function Matches() {
                   </SelectTrigger>
                   <SelectContent>
                     {teams ? (
-                      teams.map((team) => (
-                        <SelectItem key={team} value={team}>
+                      teams.map((team, index) => (
+                        <SelectItem key={`${team}-${index}`} value={team}>
                           {team}
                         </SelectItem>
                       ))
@@ -170,8 +170,8 @@ export default function Matches() {
                   </SelectTrigger>
                   <SelectContent>
                     {teams ? (
-                      teams.map((team) => (
-                        <SelectItem key={team} value={team}>
+                      teams.map((team, index) => (
+                        <SelectItem key={`${team}-${index}`} value={team}>
                           {team}
                         </SelectItem>
                       ))

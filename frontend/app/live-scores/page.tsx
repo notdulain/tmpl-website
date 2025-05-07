@@ -28,6 +28,7 @@ interface InningDataProps {
   byes: number;
   legByes: number;
   completed: boolean;
+  recentDeliveries: string[];
 }
 
 interface MatchProp {
@@ -315,13 +316,6 @@ export default function LiveScores() {
                         {teamNames[match.team1] || match.team1} vs {teamNames[match.team2] || match.team2}
                       </h1>
                     </div>
-                    <Badge
-                      variant="outline"
-                      className="text-[#800000] border-[#800000] text-xs md:text-sm"
-                    >
-                      <Clock className="h-3 w-3 md:h-4 md:w-4 mr-1" />
-                      In Progress
-                    </Badge>
                   </div>
 
                   {(() => {
@@ -457,7 +451,7 @@ export default function LiveScores() {
                             Recent Deliveries
                           </h2>
                           <div className="flex gap-2 overflow-x-auto pb-2">
-                            {liveMatch.recentDeliveries.map((ball, index) => (
+                            {inning.recentDeliveries?.slice(-4).map((ball, index) => (
                               <div
                                 key={index}
                                 className={`flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-sm md:text-base font-medium ${
