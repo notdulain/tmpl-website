@@ -144,108 +144,6 @@ export default function LiveScores() {
 
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Mock data for live match
-  const liveMatch = {
-    id: "match-1",
-    stage: "Group A",
-    status: "LIVE",
-    team1: {
-      name: "Eloquent Eagles",
-      runs: 34,
-      wickets: 2,
-      overs: "2.3",
-      extras: {
-        wides: 2,
-        noBalls: 1,
-        byes: 0,
-        legByes: 1,
-      },
-      total: 38,
-    },
-    team2: {
-      name: "Dynamic Dragons",
-      runs: 0,
-      wickets: 0,
-      overs: "0.0",
-      extras: {
-        wides: 0,
-        noBalls: 0,
-        byes: 0,
-        legByes: 0,
-      },
-      total: 0,
-    },
-    currentBatsmen: [
-      {
-        name: "A. Smith",
-        runs: 15,
-        balls: 8,
-        fours: 2,
-        sixes: 0,
-        isGirl: true,
-        isStriker: true,
-      },
-      {
-        name: "J. Kumar",
-        runs: 8,
-        balls: 6,
-        fours: 1,
-        sixes: 0,
-        isGirl: false,
-        isStriker: false,
-      },
-    ],
-    currentBowler: {
-      name: "R. Patel",
-      overs: "1.2",
-      maidens: 0,
-      runs: 12,
-      wickets: 1,
-      isGirl: true,
-    },
-    recentDeliveries: ["1", "4", "W", "NB"],
-    target: 0,
-    requiredRunRate: 0,
-  };
-
-  // Mock data for previous matches
-  const previousMatches = [
-    {
-      id: "match-1",
-      team1: {
-        name: "Eloquent Eagles",
-        runs: 45,
-        wickets: 3,
-        overs: "4.0",
-      },
-      team2: {
-        name: "Dynamic Dragons",
-        runs: 42,
-        wickets: 4,
-        overs: "4.0",
-      },
-      result: "Eloquent Eagles won by 3 runs",
-      date: "May 10, 2025",
-    },
-    {
-      id: "match-2",
-      team1: {
-        name: "Phoenix Flyers",
-        runs: 38,
-        wickets: 2,
-        overs: "4.0",
-      },
-      team2: {
-        name: "Thunder Titans",
-        runs: 39,
-        wickets: 3,
-        overs: "3.2",
-      },
-      result: "Thunder Titans won by 7 wickets",
-      date: "May 10, 2025",
-    },
-  ];
-
   const handleRefresh = () => {
     setIsRefreshing(true);
     setTimeout(() => setIsRefreshing(false), 1000);
@@ -317,7 +215,7 @@ export default function LiveScores() {
                           variant="outline"
                           className="border-[#800000] text-[#800000] text-xs md:text-sm"
                         >
-                          {liveMatch.stage}
+                          Group Stage
                         </Badge>
                       </div>
                       <h1 className="text-2xl md:text-3xl font-bold tracking-tight mt-4 mb-2">

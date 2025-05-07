@@ -207,8 +207,8 @@ export default function Home() {
             <span className="text-maroon-500">Organized</span> By
           </h2>
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <div className="bg-gradient-to-br from-[#a9b2b1] to-[#b6bebd] rounded-2xl p-6 flex flex-col items-center shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.16)] transition-shadow">
-              <div className="w-24 h-24 rounded-full overflow-hidden mb-4 ring-2 ring-white/20">
+            <div className="bg-white rounded-2xl p-6 flex flex-col items-center shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.16)] transition-shadow">
+              <div className="w-24 h-24 rounded-full overflow-hidden mb-4 ring-2 ring-maroon-500/20">
                 <Image
                   src="/divJDP.jpeg"
                   alt="Division J"
@@ -217,14 +217,14 @@ export default function Home() {
                   className="object-cover"
                 />
               </div>
-              <h3 className="text-xl font-bold mb-1 text-white">Division J</h3>
-              <p className="text-white/80 text-center">Toastmasters International</p>
-              <p className="mt-4 text-white/80 text-center">
+              <h3 className="text-xl font-bold mb-1 text-charcoal-500">Division J</h3>
+              <p className="text-charcoal-300 text-center">Toastmasters International</p>
+              <p className="mt-4 text-charcoal-300 text-center">
                 Proudly organizing the tournament to promote leadership and communication skills through sports.
               </p>
             </div>
-            <div className="bg-gradient-to-br from-[#a9b2b1] to-[#b6bebd] rounded-2xl p-6 flex flex-col items-center shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.16)] transition-shadow">
-              <div className="w-24 h-24 rounded-full overflow-hidden mb-4 ring-2 ring-white/20">
+            <div className="bg-white rounded-2xl p-6 flex flex-col items-center shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.16)] transition-shadow">
+              <div className="w-24 h-24 rounded-full overflow-hidden mb-4 ring-2 ring-maroon-500/20">
                 <Image
                   src="/CLTC_DP.jpg"
                   alt="Central Link Toastmasters"
@@ -233,10 +233,55 @@ export default function Home() {
                   className="object-cover"
                 />
               </div>
-              <h3 className="text-xl font-bold mb-1 text-white">Central Link Toastmasters</h3>
-              <p className="text-white/80 text-center">Host Club</p>
-              <p className="mt-4 text-white/80 text-center">
+              <h3 className="text-xl font-bold mb-1 text-charcoal-500">Central Link Toastmasters</h3>
+              <p className="text-charcoal-300 text-center">Host Club</p>
+              <p className="mt-4 text-charcoal-300 text-center">
                 Hosting and facilitating the tournament with enthusiasm and dedication.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Developers Section */}
+      <section id="developers" className="py-16 bg-light-white">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-charcoal-500">
+            <span className="text-maroon-500">Developed</span> By
+          </h2>
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <div className="bg-white rounded-2xl p-6 flex flex-col items-center shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.16)] transition-shadow">
+              <div className="w-24 h-24 rounded-full overflow-hidden mb-4 ring-2 ring-maroon-500/20">
+                <Image
+                  src="/dulain.jpg"
+                  alt="TM Dulain Gunawardhana"
+                  width={96}
+                  height={96}
+                  className="object-cover"
+                />
+              </div>
+              <h3 className="text-xl font-bold mb-1 text-charcoal-500">TM Dulain Gunawardhana</h3>
+              <p className="text-charcoal-300 text-center">Frontend Developer</p>
+              <p className="mt-4 text-charcoal-300 text-center">
+                Club VPPR - Central Link Toastmasters<br />
+                PR Manager - Division J
+              </p>
+            </div>
+            <div className="bg-white rounded-2xl p-6 flex flex-col items-center shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.16)] transition-shadow">
+              <div className="w-24 h-24 rounded-full overflow-hidden mb-4 ring-2 ring-maroon-500/20">
+                <Image
+                  src="/divJDP.jpeg"
+                  alt="Sathindu De Zoysa"
+                  width={96}
+                  height={96}
+                  className="object-cover"
+                />
+              </div>
+              <h3 className="text-xl font-bold mb-1 text-charcoal-500">Sathindu De Zoysa</h3>
+              <p className="text-charcoal-300 text-center">Backend Developer</p>
+              <p className="mt-4 text-charcoal-300 text-center">
+                Full Stack Developer<br />
+                Specializing in Firebase & Next.js
               </p>
             </div>
           </div>
@@ -249,15 +294,7 @@ export default function Home() {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="mb-4 md:mb-0 text-center md:text-left">
               <p className="text-charcoal-300">
-                Developed by{" "}
-                <span className="font-medium text-charcoal-500">
-                  TM Dulain Gunawardhana
-                </span>
-                <span className="text-charcoal-300"> (PR Manager - Division J)</span>
-                <span className="text-charcoal-300"> & </span>
-                <span className="font-medium text-charcoal-500">
-                  Sathindu Dhanushka
-                </span>
+                © 2025 TMPL 2.0. All rights reserved.
               </p>
             </div>
             <div className="flex space-x-6">
