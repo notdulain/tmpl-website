@@ -93,9 +93,9 @@ export default function LiveScores() {
         const names: Record<string, string> = {};
         const teams: Record<string, TeamProps> = {};
         const uniqueTeamIds = new Set<string>();
-        
+
         // Collect all unique team IDs
-        Object.values(matches).forEach(match => {
+        Object.values(matches).forEach((match) => {
           uniqueTeamIds.add(match.team1);
           uniqueTeamIds.add(match.team2);
         });
@@ -110,7 +110,7 @@ export default function LiveScores() {
             teams[teamId] = data;
           }
         }
-        
+
         setTeamNames(names);
         setTeamData(teams);
       }
@@ -318,188 +318,196 @@ export default function LiveScores() {
                         </Badge>
                       </div>
                       <h1 className="text-lg md:text-2xl font-bold">
-                        {teamNames[match.team1] || match.team1} vs {teamNames[match.team2] || match.team2}
+                        {teamNames[match.team1] || match.team1} vs{" "}
+                        {teamNames[match.team2] || match.team2}
                       </h1>
                     </div>
                   </div>
 
-                  {(() => {
-                    const inning: InningDataProps = match.innings[1].completed
-                      ? match.innings[2]
-                      : match.innings[1];
+                  {match.innings &&
+                    (() => {
+                      const inning: InningDataProps = match?.innings[1]
+                        .completed
+                        ? match.innings[2]
+                        : match.innings[1];
 
-                    return (
-                      <div>
-                        {/* Score Display */}
-                        <div className="bg-[#F5F5F5] rounded-lg p-4 md:p-6">
-                          <div className="flex justify-between items-center">
-                            <div>
-                              <div className="text-sm md:text-base text-[#666666]">
-                                Batting
+                      return (
+                        <div>
+                          {/* Score Display */}
+                          <div className="bg-[#F5F5F5] rounded-lg p-4 md:p-6">
+                            <div className="flex justify-between items-center">
+                              <div>
+                                <div className="text-sm md:text-base text-[#666666]">
+                                  Batting
+                                </div>
+                                <div className="text-2xl md:text-4xl font-bold text-[#800000]">
+                                  {inning.runs} / {inning.wickets}
+                                  {/* {liveMatch.team1.runs}/{liveMatch.team1.wickets} */}
+                                </div>
                               </div>
-                              <div className="text-2xl md:text-4xl font-bold text-[#800000]">
-                                {inning.runs} / {inning.wickets}
-                                {/* {liveMatch.team1.runs}/{liveMatch.team1.wickets} */}
-                              </div>
-                            </div>
-                            <div className="text-right">
-                              <div className="text-sm md:text-base text-[#666666]">
-                                Overs
-                              </div>
-                              <div className="text-lg md:text-2xl font-medium">
-                                {parseFloat(
-                                  `${Math.floor(inning.overs / 4)}.${
-                                    inning.overs % 4
-                                  }`
-                                )}
-                                /4.0
+                              <div className="text-right">
+                                <div className="text-sm md:text-base text-[#666666]">
+                                  Overs
+                                </div>
+                                <div className="text-lg md:text-2xl font-medium">
+                                  {parseFloat(
+                                    `${Math.floor(inning.overs / 4)}.${
+                                      inning.overs % 4
+                                    }`
+                                  )}
+                                  /4.0
+                                </div>
                               </div>
                             </div>
                           </div>
-                        </div>
 
-                        {/* Current Batsmen */}
-                        <div className="space-y-3">
-                          <h2 className="text-sm md:text-base font-medium text-[#666666]">
-                            Current Batsmen
-                          </h2>
+                          {/* Current Batsmen */}
+                          <div className="space-y-3">
+                            <h2 className="text-sm md:text-base font-medium text-[#666666]">
+                              Current Batsmen
+                            </h2>
 
-                          <div className="flex justify-between items-center bg-[#F5F5F5] rounded-lg p-3 md:p-4">
-                            <div>
-                              <div className="flex items-center gap-2">
-                                <span className="font-medium text-sm md:text-base">
-                                  {inning.batsman1 && teamData[match.team1]?.[inning.batsman1]}
-                                </span>
-                                {inning.stricker == inning.batsman1 && (
-                                  <Badge
-                                    variant="outline"
-                                    className="text-xs md:text-sm border-[#800000] text-[#800000]"
+                            <div className="flex justify-between items-center bg-[#F5F5F5] rounded-lg p-3 md:p-4">
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <span className="font-medium text-sm md:text-base">
+                                    {inning.batsman1 &&
+                                      teamData[match.team1]?.[inning.batsman1]}
+                                  </span>
+                                  {inning.stricker == inning.batsman1 && (
+                                    <Badge
+                                      variant="outline"
+                                      className="text-xs md:text-sm border-[#800000] text-[#800000]"
+                                    >
+                                      Striker
+                                    </Badge>
+                                  )}
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <div className="font-bold text-[#800000] text-sm md:text-base">
+                                  {inning.batsman1Runs}
+                                </div>
+                                <div className="text-xs md:text-sm text-[#666666]">
+                                  {inning.batsman1Balls} balls
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex justify-between items-center bg-[#F5F5F5] rounded-lg p-3 md:p-4">
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <span className="font-medium text-sm md:text-base">
+                                    {inning.batsman2 &&
+                                      teamData[match.team1]?.[inning.batsman2]}
+                                  </span>
+                                  {inning.stricker == inning.batsman2 && (
+                                    <Badge
+                                      variant="outline"
+                                      className="text-xs md:text-sm border-[#800000] text-[#800000]"
+                                    >
+                                      Striker
+                                    </Badge>
+                                  )}
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <div className="font-bold text-[#800000] text-sm md:text-base">
+                                  {inning.batsman2Runs}
+                                </div>
+                                <div className="text-xs md:text-sm text-[#666666]">
+                                  {inning.batsman2Balls} balls
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Current Bowler */}
+                          <div className="space-y-2">
+                            <h2 className="text-sm md:text-base font-medium text-[#666666]">
+                              Current Bowler
+                            </h2>
+                            <div className="flex justify-between items-center bg-[#F5F5F5] rounded-lg p-3 md:p-4">
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <span className="font-medium text-sm md:text-base">
+                                    {inning.bowler &&
+                                      teamData[match.team2]?.[inning.bowler]}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Recent Deliveries */}
+                          <div className="space-y-2">
+                            <h2 className="text-sm md:text-base font-medium text-[#666666]">
+                              Recent Deliveries
+                            </h2>
+                            <div className="flex gap-2 overflow-x-auto pb-2">
+                              {inning.recentDeliveries
+                                ?.slice(-4)
+                                .map((ball, index) => (
+                                  <div
+                                    key={index}
+                                    className={`flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-sm md:text-base font-medium ${
+                                      ball === "W"
+                                        ? "bg-[#800000]/10 text-[#800000]"
+                                        : ball === "4" || ball === "6"
+                                        ? "bg-[#800000]/10 text-[#800000]"
+                                        : ball === "NB" || ball === "WD"
+                                        ? "bg-yellow-500/10 text-yellow-600"
+                                        : "bg-[#F5F5F5] text-[#1A1A1A]"
+                                    }`}
                                   >
-                                    Striker
-                                  </Badge>
-                                )}
-                              </div>
-                            </div>
-                            <div className="text-right">
-                              <div className="font-bold text-[#800000] text-sm md:text-base">
-                                {inning.batsman1Runs}
-                              </div>
-                              <div className="text-xs md:text-sm text-[#666666]">
-                                {inning.batsman1Balls} balls
-                              </div>
+                                    {ball}
+                                  </div>
+                                ))}
                             </div>
                           </div>
-                          <div className="flex justify-between items-center bg-[#F5F5F5] rounded-lg p-3 md:p-4">
-                            <div>
-                              <div className="flex items-center gap-2">
-                                <span className="font-medium text-sm md:text-base">
-                                  {inning.batsman2 && teamData[match.team1]?.[inning.batsman2]}
-                                </span>
-                                {inning.stricker == inning.batsman2 && (
-                                  <Badge
-                                    variant="outline"
-                                    className="text-xs md:text-sm border-[#800000] text-[#800000]"
-                                  >
-                                    Striker
-                                  </Badge>
-                                )}
-                              </div>
-                            </div>
-                            <div className="text-right">
-                              <div className="font-bold text-[#800000] text-sm md:text-base">
-                                {inning.batsman2Runs}
-                              </div>
-                              <div className="text-xs md:text-sm text-[#666666]">
-                                {inning.batsman2Balls} balls
-                              </div>
-                            </div>
-                          </div>
-                        </div>
 
-                        {/* Current Bowler */}
-                        <div className="space-y-2">
-                          <h2 className="text-sm md:text-base font-medium text-[#666666]">
-                            Current Bowler
-                          </h2>
-                          <div className="flex justify-between items-center bg-[#F5F5F5] rounded-lg p-3 md:p-4">
-                            <div>
-                              <div className="flex items-center gap-2">
-                                <span className="font-medium text-sm md:text-base">
-                                  {inning.bowler && teamData[match.team2]?.[inning.bowler]}
-                                </span>
+                          {/* Extras */}
+                          <div className="space-y-2">
+                            <h2 className="text-sm md:text-base font-medium text-[#666666]">
+                              Extras
+                            </h2>
+                            <div className="grid grid-cols-4 gap-2 bg-[#F5F5F5] rounded-lg p-3 md:p-4">
+                              <div className="text-center">
+                                <div className="text-xs md:text-sm text-[#666666]">
+                                  Wides
+                                </div>
+                                <div className="font-medium text-sm md:text-base">
+                                  {inning.wides}
+                                </div>
+                              </div>
+                              <div className="text-center">
+                                <div className="text-xs md:text-sm text-[#666666]">
+                                  No Balls
+                                </div>
+                                <div className="font-medium text-sm md:text-base">
+                                  {inning.noBals}
+                                </div>
+                              </div>
+                              <div className="text-center">
+                                <div className="text-xs md:text-sm text-[#666666]">
+                                  Byes
+                                </div>
+                                <div className="font-medium text-sm md:text-base">
+                                  {inning.byes}
+                                </div>
+                              </div>
+                              <div className="text-center">
+                                <div className="text-xs md:text-sm text-[#666666]">
+                                  Leg Byes
+                                </div>
+                                <div className="font-medium text-sm md:text-base">
+                                  {inning.legByes}
+                                </div>
                               </div>
                             </div>
                           </div>
                         </div>
-
-                        {/* Recent Deliveries */}
-                        <div className="space-y-2">
-                          <h2 className="text-sm md:text-base font-medium text-[#666666]">
-                            Recent Deliveries
-                          </h2>
-                          <div className="flex gap-2 overflow-x-auto pb-2">
-                            {inning.recentDeliveries?.slice(-4).map((ball, index) => (
-                              <div
-                                key={index}
-                                className={`flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-sm md:text-base font-medium ${
-                                  ball === "W"
-                                    ? "bg-[#800000]/10 text-[#800000]"
-                                    : ball === "4" || ball === "6"
-                                    ? "bg-[#800000]/10 text-[#800000]"
-                                    : ball === "NB" || ball === "WD"
-                                    ? "bg-yellow-500/10 text-yellow-600"
-                                    : "bg-[#F5F5F5] text-[#1A1A1A]"
-                                }`}
-                              >
-                                {ball}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-
-                        {/* Extras */}
-                        <div className="space-y-2">
-                          <h2 className="text-sm md:text-base font-medium text-[#666666]">
-                            Extras
-                          </h2>
-                          <div className="grid grid-cols-4 gap-2 bg-[#F5F5F5] rounded-lg p-3 md:p-4">
-                            <div className="text-center">
-                              <div className="text-xs md:text-sm text-[#666666]">
-                                Wides
-                              </div>
-                              <div className="font-medium text-sm md:text-base">
-                                {inning.wides}
-                              </div>
-                            </div>
-                            <div className="text-center">
-                              <div className="text-xs md:text-sm text-[#666666]">
-                                No Balls
-                              </div>
-                              <div className="font-medium text-sm md:text-base">
-                                {inning.noBals}
-                              </div>
-                            </div>
-                            <div className="text-center">
-                              <div className="text-xs md:text-sm text-[#666666]">
-                                Byes
-                              </div>
-                              <div className="font-medium text-sm md:text-base">
-                                {inning.byes}
-                              </div>
-                            </div>
-                            <div className="text-center">
-                              <div className="text-xs md:text-sm text-[#666666]">
-                                Leg Byes
-                              </div>
-                              <div className="font-medium text-sm md:text-base">
-                                {inning.legByes}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })()}
+                      );
+                    })()}
                 </CardContent>
               </Card>
             ) : (
@@ -533,27 +541,45 @@ export default function LiveScores() {
                       <div className="space-y-2">
                         <div className="flex justify-between items-center">
                           <div className="flex-1">
-                            <div className="font-medium">{teamNames[match.team1] || match.team1}</div>
+                            <div className="font-medium">
+                              {teamNames[match.team1] || match.team1}
+                            </div>
                             <div className="text-sm text-[#666666]">
-                              {match.innings && match.innings[1] ? `${Math.floor(match.innings[1].overs / 4)}.${match.innings[1].overs % 4}` : '0.0'} overs
+                              {match.innings && match.innings[1]
+                                ? `${Math.floor(match.innings[1].overs / 4)}.${
+                                    match.innings[1].overs % 4
+                                  }`
+                                : "0.0"}{" "}
+                              overs
                             </div>
                           </div>
                           <div className="text-right">
                             <div className="font-bold text-[#800000]">
-                              {match.innings && match.innings[1] ? `${match.innings[1].runs}/${match.innings[1].wickets}` : '0/0'}
+                              {match.innings && match.innings[1]
+                                ? `${match.innings[1].runs}/${match.innings[1].wickets}`
+                                : "0/0"}
                             </div>
                           </div>
                         </div>
                         <div className="flex justify-between items-center">
                           <div className="flex-1">
-                            <div className="font-medium">{teamNames[match.team2] || match.team2}</div>
+                            <div className="font-medium">
+                              {teamNames[match.team2] || match.team2}
+                            </div>
                             <div className="text-sm text-[#666666]">
-                              {match.innings && match.innings[2] ? `${Math.floor(match.innings[2].overs / 4)}.${match.innings[2].overs % 4}` : '0.0'} overs
+                              {match.innings && match.innings[2]
+                                ? `${Math.floor(match.innings[2].overs / 4)}.${
+                                    match.innings[2].overs % 4
+                                  }`
+                                : "0.0"}{" "}
+                              overs
                             </div>
                           </div>
                           <div className="text-right">
                             <div className="font-bold text-[#800000]">
-                              {match.innings && match.innings[2] ? `${match.innings[2].runs}/${match.innings[2].wickets}` : '0/0'}
+                              {match.innings && match.innings[2]
+                                ? `${match.innings[2].runs}/${match.innings[2].wickets}`
+                                : "0/0"}
                             </div>
                           </div>
                         </div>
