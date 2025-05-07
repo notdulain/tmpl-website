@@ -38,6 +38,7 @@ interface MatchProp {
   toss: string;
   tossDecision: string;
   innings: InningDataProps[];
+  battingTeam?: string;
 }
 
 interface TeamProps {
@@ -75,6 +76,7 @@ export default function LiveScores() {
   const database = getDatabase(app);
   const [matches, setMatches] = useState<MatchProp[]>();
   const [teamNames, setTeamNames] = useState<Record<string, string>>({});
+  const [teamData, setTeamData] = useState<Record<string, TeamProps>>({});
 
   useEffect(() => {
     const dataRef = ref(database, "matches/");
@@ -86,9 +88,10 @@ export default function LiveScores() {
   }, []);
 
   useEffect(() => {
-    const fetchTeamNames = async () => {
+    const fetchTeamData = async () => {
       if (matches) {
         const names: Record<string, string> = {};
+        const teams: Record<string, TeamProps> = {};
         const uniqueTeamIds = new Set<string>();
         
         // Collect all unique team IDs
@@ -102,16 +105,18 @@ export default function LiveScores() {
           const teamRef = ref(database, `teams/${teamId}`);
           const snapshot = await get(teamRef);
           if (snapshot.exists()) {
-            const teamData = snapshot.val();
-            names[teamId] = teamData.name;
+            const data = snapshot.val();
+            names[teamId] = data.name;
+            teams[teamId] = data;
           }
         }
         
         setTeamNames(names);
+        setTeamData(teams);
       }
     };
 
-    fetchTeamNames();
+    fetchTeamData();
   }, [matches, database]);
 
   useEffect(() => {
@@ -363,7 +368,7 @@ export default function LiveScores() {
                             <div>
                               <div className="flex items-center gap-2">
                                 <span className="font-medium text-sm md:text-base">
-                                  {inning.batsman1}
+                                  {inning.batsman1 && teamData[match.team1]?.[inning.batsman1]}
                                 </span>
                                 {inning.stricker == inning.batsman1 && (
                                   <Badge
@@ -374,9 +379,6 @@ export default function LiveScores() {
                                   </Badge>
                                 )}
                               </div>
-                              {/* <div className="text-xs md:text-sm text-[#666666]">
-                          {batsman.fours} fours, {batsman.sixes} sixes
-                        </div> */}
                             </div>
                             <div className="text-right">
                               <div className="font-bold text-[#800000] text-sm md:text-base">
@@ -391,7 +393,7 @@ export default function LiveScores() {
                             <div>
                               <div className="flex items-center gap-2">
                                 <span className="font-medium text-sm md:text-base">
-                                  {inning.batsman2}
+                                  {inning.batsman2 && teamData[match.team1]?.[inning.batsman2]}
                                 </span>
                                 {inning.stricker == inning.batsman2 && (
                                   <Badge
@@ -402,9 +404,6 @@ export default function LiveScores() {
                                   </Badge>
                                 )}
                               </div>
-                              {/* <div className="text-xs md:text-sm text-[#666666]">
-                          {batsman.fours} fours, {batsman.sixes} sixes
-                        </div> */}
                             </div>
                             <div className="text-right">
                               <div className="font-bold text-[#800000] text-sm md:text-base">
@@ -426,22 +425,10 @@ export default function LiveScores() {
                             <div>
                               <div className="flex items-center gap-2">
                                 <span className="font-medium text-sm md:text-base">
-                                  {inning.bowler}
+                                  {inning.bowler && teamData[match.team2]?.[inning.bowler]}
                                 </span>
                               </div>
-                              {/* <div className="text-xs md:text-sm text-[#666666]">
-                                {liveMatch.currentBowler.maidens} maidens
-                              </div> */}
                             </div>
-                            {/* <div className="text-right">
-                              <div className="font-bold text-[#800000] text-sm md:text-base">
-                                {liveMatch.currentBowler.wickets}/
-                                {liveMatch.currentBowler.runs}
-                              </div>
-                              <div className="text-xs md:text-sm text-[#666666]">
-                                {liveMatch.currentBowler.overs} overs
-                              </div>
-                            </div> */}
                           </div>
                         </div>
 
