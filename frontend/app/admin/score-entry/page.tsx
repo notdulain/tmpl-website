@@ -346,19 +346,17 @@ export default function ScoreEntry() {
   };
 
   const handleWicket = (data: InningDataProps) => {
-    if (lossBatsman == striker) {
+    // Remove the dismissed batsman from the batting pair
+    if (lossBatsman === striker) {
       setStriker("");
-    } else {
-      setNonStriker("");
-    }
-    if ((inningData.batsman1 = lossBatsman)) {
       data.batsman1 = "";
-      data.batsman1Balls = 0;
       data.batsman1Runs = 0;
-    } else {
+      data.batsman1Balls = 0;
+    } else if (lossBatsman === nonStriker) {
+      setNonStriker("");
       data.batsman2 = "";
-      data.batsman1Balls = 0;
-      data.batsman1Runs = 0;
+      data.batsman2Runs = 0;
+      data.batsman2Balls = 0;
     }
 
     data.wickets = inningData.wickets + 1;
@@ -886,17 +884,17 @@ export default function ScoreEntry() {
                       ))}
                     </div>
                     <div>
-                      <Label htmlFor="nonStriker">Non-Striker</Label>
+                      <Label htmlFor="dismissedBatsman">Dismissed Batsman</Label>
 
                       <Select
                         value={lossBatsman}
                         onValueChange={setLossBatsman}
                       >
                         <SelectTrigger
-                          id="battingTeam"
+                          id="dismissedBatsman"
                           className="bg-white border-[#E5E5E5]"
                         >
-                          <SelectValue placeholder="Select Batting Team" />
+                          <SelectValue placeholder="Select dismissed batsman" />
                         </SelectTrigger>
                         <SelectContent>
                           {striker && nonStriker && (
