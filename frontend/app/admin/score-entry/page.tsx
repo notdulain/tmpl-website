@@ -29,6 +29,14 @@ import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import { app } from "@/lib/firebase";
 import { get, getDatabase, ref, set } from "firebase/database";
 import { run } from "node:test";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import Swal from 'sweetalert2';
 
 interface TeamProps {
   [key: string]: string;
@@ -120,6 +128,8 @@ export default function ScoreEntry() {
     completed: false,
     recentDeliveries: [],
   });
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showUndoModal, setShowUndoModal] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -363,7 +373,7 @@ export default function ScoreEntry() {
     return data;
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     let data = inningData;
@@ -400,23 +410,29 @@ export default function ScoreEntry() {
 
     if (selectedMatch && inning != "") {
       const refference = ref(db, `matches/${selectedMatch}/innings/${inning}`);
-      set(refference, data);
-    }
+      await set(refference, data);
+      
+      // Show success message using SweetAlert2
+      Swal.fire({
+        title: 'Ball Submitted Successfully!',
+        text: 'The ball has been recorded and the score has been updated.',
+        icon: 'success',
+        confirmButtonColor: '#800000',
+        confirmButtonText: 'Continue'
+      });
 
-    // Here you would handle the submission to update the score
-    alert("Ball submitted successfully!");
-    // Reset form fields
-    setRuns("0");
-    setIsWicket(false);
-    setIsExtra(false);
-    setExtraType("");
-    setDismissalType("");
-    setComment("");
+      // Reset form fields
+      setRuns("0");
+      setIsWicket(false);
+      setIsExtra(false);
+      setExtraType("");
+      setDismissalType("");
+      setComment("");
+    }
   };
 
   const handleUndo = () => {
-    // Here you would handle undoing the last ball
-    alert("Last ball undone!");
+    setShowUndoModal(true);
   };
 
   // Update toss information when match changes
@@ -969,6 +985,38 @@ export default function ScoreEntry() {
             Create a match
           </Button>
         </main>
+
+        {/* Undo Modal */}
+        <Dialog open={showUndoModal} onOpenChange={setShowUndoModal}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-center text-xl font-semibold text-[#800000]">
+                Undo Last Ball
+              </DialogTitle>
+              <DialogDescription className="text-center text-gray-600">
+                Are you sure you want to undo the last ball? This action cannot be reversed.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex justify-center gap-4 mt-4">
+              <Button
+                variant="outline"
+                onClick={() => setShowUndoModal(false)}
+                className="border-[#E5E5E5] text-[#666666] hover:bg-[#F5F5F5]"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  // Here you would handle undoing the last ball
+                  setShowUndoModal(false);
+                }}
+                className="bg-[#800000] hover:bg-[#600000] text-white"
+              >
+                Undo
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     )
   );
