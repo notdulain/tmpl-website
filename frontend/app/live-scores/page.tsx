@@ -320,8 +320,11 @@ export default function LiveScores() {
                           {liveMatch.stage}
                         </Badge>
                       </div>
-                      <h1 className="text-lg md:text-2xl font-bold">
-                        {teamNames[match.team1] || match.team1} vs {teamNames[match.team2] || match.team2}
+                      <h1 className="text-2xl md:text-3xl font-bold tracking-tight mt-4 mb-2">
+                        <div className="flex flex-col md:flex-row md:items-center md:gap-2">
+                          <span>{teamNames[match.team1] || match.team1} vs</span>
+                          <span>{teamNames[match.team2] || match.team2}</span>
+                        </div>
                       </h1>
                     </div>
                   </div>
