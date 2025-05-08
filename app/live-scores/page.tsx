@@ -166,7 +166,7 @@ export default function LiveScores() {
     const ballsLeft = totalBalls - oversPlayed;
 
     if (runsScored >= runsToWin) {
-      const wicketsRemaining = 10 - wicketsLost;
+      const wicketsRemaining = 8 - wicketsLost;
       if (secondInning.battingTeam == "team1") {
         return `${
           teamNames[match.team1]
