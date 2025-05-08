@@ -86,3 +86,19 @@
     text-wrap: balance;
   }
 }
+
+/* Countdown styles */
+.countdown {
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: white;
+}
+
+.countdown > span {
+  display: inline-block;
+  min-width: 2ch;
+  text-align: center;
+  color: white;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
