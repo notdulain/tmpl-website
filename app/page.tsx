@@ -142,7 +142,7 @@ export default function Home() {
                 variant="outline"
                 className="border-maroon-500 text-maroon-500 hover:bg-maroon-500 hover:text-light-white px-6 py-5 text-base md:text-lg rounded-lg"
               >
-                <Link href="#teams">Team Profiles</Link>
+                <Link href="#teams">Leaderboard</Link>
               </Button>
             </div>
           </div>
@@ -270,7 +270,7 @@ export default function Home() {
             <div className="bg-white rounded-2xl p-6 flex flex-col items-center shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.16)] transition-shadow">
               <div className="w-24 h-24 rounded-full overflow-hidden mb-4 ring-2 ring-maroon-500/20">
                 <Image
-                  src="/divJDP.jpeg"
+                  src="/sathindu.jpg"
                   alt="Sathindu De Zoysa"
                   width={96}
                   height={96}
