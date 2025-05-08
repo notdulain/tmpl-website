@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import { app } from "@/lib/firebase";
 import { getDatabase, ref, set } from "firebase/database";
@@ -30,6 +30,18 @@ export default function Register() {
     member8: "",
   });
   const [teamId, setTeamId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        router.push("/admin");
+      } else {
+        setAuthState(true);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [auth, router]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
