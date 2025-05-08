@@ -397,6 +397,83 @@ export default function ScoreEntry() {
     setShowUndoModal(true);
   };
 
+  const handleUndoConfirm = async () => {
+    if (selectedMatch && inning && inningData.recentDeliveries.length > 0) {
+      const lastBall = inningData.recentDeliveries[inningData.recentDeliveries.length - 1];
+      let updatedData = { ...inningData };
+
+      // Remove the last ball from recentDeliveries
+      updatedData.recentDeliveries = updatedData.recentDeliveries.slice(0, -1);
+
+      // Update runs based on the last ball
+      if (lastBall === "W") {
+        updatedData.wickets = Math.max(0, updatedData.wickets - 1);
+      } else if (lastBall === "WD") {
+        updatedData.wides = Math.max(0, updatedData.wides - 1);
+        updatedData.runs = Math.max(0, updatedData.runs - 1);
+      } else if (lastBall === "NB") {
+        updatedData.noBals = Math.max(0, updatedData.noBals - 1);
+        updatedData.runs = Math.max(0, updatedData.runs - 1);
+      } else {
+        const runs = parseInt(lastBall);
+        if (!isNaN(runs)) {
+          updatedData.runs = Math.max(0, updatedData.runs - runs);
+        }
+      }
+
+      // Update batsmen statistics
+      if (updatedData.stricker === updatedData.batsman1) {
+        if (lastBall === "W") {
+          updatedData.batsman1 = "";
+          updatedData.batsman1Runs = 0;
+          updatedData.batsman1Balls = 0;
+        } else if (lastBall === "WD" || lastBall === "NB") {
+          // No change to batsman statistics for extras
+        } else {
+          const runs = parseInt(lastBall);
+          if (!isNaN(runs)) {
+            updatedData.batsman1Runs = Math.max(0, updatedData.batsman1Runs - runs);
+            updatedData.batsman1Balls = Math.max(0, updatedData.batsman1Balls - 1);
+          }
+        }
+      } else if (updatedData.stricker === updatedData.batsman2) {
+        if (lastBall === "W") {
+          updatedData.batsman2 = "";
+          updatedData.batsman2Runs = 0;
+          updatedData.batsman2Balls = 0;
+        } else if (lastBall === "WD" || lastBall === "NB") {
+          // No change to batsman statistics for extras
+        } else {
+          const runs = parseInt(lastBall);
+          if (!isNaN(runs)) {
+            updatedData.batsman2Runs = Math.max(0, updatedData.batsman2Runs - runs);
+            updatedData.batsman2Balls = Math.max(0, updatedData.batsman2Balls - 1);
+          }
+        }
+      }
+
+      // Update overs
+      if (lastBall !== "WD" && lastBall !== "NB") {
+        updatedData.overs = Math.max(0, updatedData.overs - 1);
+      }
+
+      // Save the updated data
+      const reference = ref(db, `matches/${selectedMatch}/innings/${inning}`);
+      await set(reference, updatedData);
+      setInningData(updatedData);
+
+      // Show success message
+      Swal.fire({
+        title: 'Ball Undone Successfully!',
+        text: 'The last ball has been removed and the score has been updated.',
+        icon: 'success',
+        confirmButtonColor: '#800000',
+        confirmButtonText: 'Continue'
+      });
+    }
+    setShowUndoModal(false);
+  };
+
   // Update toss information when match changes
   useEffect(() => {
     if (matches && selectedMatch) {
@@ -975,10 +1052,7 @@ export default function ScoreEntry() {
                 Cancel
               </Button>
               <Button
-                onClick={() => {
-                  // Here you would handle undoing the last ball
-                  setShowUndoModal(false);
-                }}
+                onClick={handleUndoConfirm}
                 className="bg-[#800000] hover:bg-[#600000] text-white"
               >
                 Undo
