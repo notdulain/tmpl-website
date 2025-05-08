@@ -142,7 +142,7 @@ export default function Home() {
                 variant="outline"
                 className="border-maroon-500 text-maroon-500 hover:bg-maroon-500 hover:text-light-white px-6 py-5 text-base md:text-lg rounded-lg"
               >
-                <Link href="#teams">Leaderboard</Link>
+                <Link href="/leaderboard">Leaderboard</Link>
               </Button>
             </div>
           </div>
