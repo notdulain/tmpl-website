@@ -273,8 +273,17 @@ export default function LiveScores() {
                               <div>
                                 <div className="flex items-center gap-2">
                                   <span className="font-medium text-sm md:text-base">
-                                    {inning.batsman1 &&
-                                      teamData[match.team1]?.[inning.batsman1]}
+                                    {(() => {
+                                      console.log('Debug batsman1:', {
+                                        battingTeam: inning.battingTeam,
+                                        team1: match.team1,
+                                        team2: match.team2,
+                                        batsman1: inning.batsman1,
+                                        teamData: teamData
+                                      });
+                                      return inning.batsman1 &&
+                                        teamData[inning.battingTeam === "team1" ? match.team1 : match.team2]?.[inning.batsman1];
+                                    })()}
                                   </span>
                                   {inning.stricker == inning.batsman1 && (
                                     <Badge
@@ -300,7 +309,7 @@ export default function LiveScores() {
                                 <div className="flex items-center gap-2">
                                   <span className="font-medium text-sm md:text-base">
                                     {inning.batsman2 &&
-                                      teamData[match.team1]?.[inning.batsman2]}
+                                      teamData[inning.battingTeam === "team1" ? match.team1 : match.team2]?.[inning.batsman2]}
                                   </span>
                                   {inning.stricker == inning.batsman2 && (
                                     <Badge
@@ -333,7 +342,7 @@ export default function LiveScores() {
                                 <div className="flex items-center gap-2">
                                   <span className="font-medium text-sm md:text-base">
                                     {inning.bowler &&
-                                      teamData[match.team2]?.[inning.bowler]}
+                                      teamData[inning.battingTeam === "team1" ? match.team2 : match.team1]?.[inning.bowler]}
                                   </span>
                                 </div>
                               </div>
