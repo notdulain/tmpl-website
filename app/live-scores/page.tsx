@@ -262,9 +262,15 @@ export default function LiveScores() {
                   </div>
                   <div className="flex justify-between items-center">
                     <div></div>
-                    <p className="font-bold text-lg text-right">
-                      Target: {handleTarget(match)}
-                    </p>
+                    {(() => {
+                      const target = handleTarget(match);
+                      if (target == "") return "";
+                      return (
+                        <p className="font-bold text-lg text-right">
+                          Target: {handleTarget(match)}
+                        </p>
+                      );
+                    })()}
                   </div>
 
                   {match.innings &&
@@ -315,15 +321,21 @@ export default function LiveScores() {
                                 <div className="flex items-center gap-2">
                                   <span className="font-medium text-sm md:text-base">
                                     {(() => {
-                                      console.log('Debug batsman1:', {
+                                      console.log("Debug batsman1:", {
                                         battingTeam: inning.battingTeam,
                                         team1: match.team1,
                                         team2: match.team2,
                                         batsman1: inning.batsman1,
-                                        teamData: teamData
+                                        teamData: teamData,
                                       });
-                                      return inning.batsman1 &&
-                                        teamData[inning.battingTeam === "team1" ? match.team1 : match.team2]?.[inning.batsman1];
+                                      return (
+                                        inning.batsman1 &&
+                                        teamData[
+                                          inning.battingTeam === "team1"
+                                            ? match.team1
+                                            : match.team2
+                                        ]?.[inning.batsman1]
+                                      );
                                     })()}
                                   </span>
                                   {inning.stricker == inning.batsman1 &&
@@ -351,7 +363,11 @@ export default function LiveScores() {
                                 <div className="flex items-center gap-2">
                                   <span className="font-medium text-sm md:text-base">
                                     {inning.batsman2 &&
-                                      teamData[inning.battingTeam === "team1" ? match.team1 : match.team2]?.[inning.batsman2]}
+                                      teamData[
+                                        inning.battingTeam === "team1"
+                                          ? match.team1
+                                          : match.team2
+                                      ]?.[inning.batsman2]}
                                   </span>
                                   {inning.stricker == inning.batsman2 &&
                                     inning.stricker != "" && (
@@ -385,7 +401,11 @@ export default function LiveScores() {
                                 <div className="flex items-center gap-2">
                                   <span className="font-medium text-sm md:text-base">
                                     {inning.bowler &&
-                                      teamData[inning.battingTeam === "team1" ? match.team2 : match.team1]?.[inning.bowler]}
+                                      teamData[
+                                        inning.battingTeam === "team1"
+                                          ? match.team2
+                                          : match.team1
+                                      ]?.[inning.bowler]}
                                   </span>
                                 </div>
                               </div>

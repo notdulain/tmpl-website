@@ -330,6 +330,11 @@ export default function ScoreEntry() {
           update(refference, { completed: true });
           inningData.completed = true;
           setInningComplete(true);
+          setInning("");
+          setBattingTeam("");
+          setStriker("");
+          setBowler("");
+          setNonStriker("");
 
           Swal.fire({
             title: "Inining Completed!",
