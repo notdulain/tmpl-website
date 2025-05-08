@@ -254,23 +254,22 @@ export default function LiveScores() {
                           {match.group}
                         </Badge>
                       </div>
-                      <h1 className="text-lg md:text-2xl font-bold">
-                        {teamNames[match.team1] || match.team1} vs{" "}
-                        {teamNames[match.team2] || match.team2}
-                      </h1>
+                      <div className="flex items-center gap-2">
+                        <h1 className="text-lg md:text-2xl font-bold">
+                          {teamNames[match.team1] || match.team1} vs{" "}
+                          {teamNames[match.team2] || match.team2}
+                        </h1>
+                        {(() => {
+                          const target = handleTarget(match);
+                          if (target === "") return null;
+                          return (
+                            <span className="text-sm md:text-base text-[#666666]">
+                              (Target: {target})
+                            </span>
+                          );
+                        })()}
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <div></div>
-                    {(() => {
-                      const target = handleTarget(match);
-                      if (target == "") return "";
-                      return (
-                        <p className="font-bold text-lg text-right">
-                          Target: {handleTarget(match)}
-                        </p>
-                      );
-                    })()}
                   </div>
 
                   {match.innings &&

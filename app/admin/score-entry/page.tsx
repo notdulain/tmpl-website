@@ -337,7 +337,7 @@ export default function ScoreEntry() {
           setNonStriker("");
 
           Swal.fire({
-            title: "Inining Completed!",
+            title: "Innining Completed!",
             text: `${inning} was completed successfully`,
             icon: "success",
           });
@@ -707,11 +707,7 @@ export default function ScoreEntry() {
                   >
                     <SelectTrigger className="bg-white border-[#E5E5E5]">
                       <SelectValue placeholder="Select toss winner">
-                        {tossWinner === "team1" && matches && selectedMatch
-                          ? matches[selectedMatch].team1
-                          : tossWinner === "team2" && matches && selectedMatch
-                          ? matches[selectedMatch].team2
-                          : "Select toss winner"}
+                        {tossWinner || "Select toss winner"}
                       </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
@@ -780,7 +776,7 @@ export default function ScoreEntry() {
                       }`}
                       onClick={handleInningCompleteButton}
                     >
-                      Complete Ining
+                      Complete Inning
                     </Button>
                   </div>
                 </div>

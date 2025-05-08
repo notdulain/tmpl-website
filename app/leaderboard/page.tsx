@@ -32,7 +32,7 @@ export default function LeaderboardPage() {
           {/* Group A */}
           <div className="bg-white rounded-xl shadow-md overflow-hidden border border-[#E6E6E6]">
             <div className="border-l-4 border-[#800000] bg-gradient-to-r from-[#800000]/5 to-transparent px-6 py-4">
-              <h2 className="text-xl font-bold text-[#800000] uppercase tracking-wide">Group A</h2>
+              <h2 className="text-xl font-bold text-[#800000] uppercase tracking-wide">Group 1</h2>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -72,7 +72,7 @@ export default function LeaderboardPage() {
           {/* Group B */}
           <div className="bg-white rounded-xl shadow-md overflow-hidden border border-[#E6E6E6]">
             <div className="border-l-4 border-[#800000] bg-gradient-to-r from-[#800000]/5 to-transparent px-6 py-4">
-              <h2 className="text-xl font-bold text-[#800000] uppercase tracking-wide">Group B</h2>
+              <h2 className="text-xl font-bold text-[#800000] uppercase tracking-wide">Group 2</h2>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full">
