@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/select";
 
 import { MatchProp, InningDataProps } from "@/app/types/interfaces";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 export default function Matches() {
   const db = getDatabase(app);
@@ -26,6 +27,20 @@ export default function Matches() {
   const [selectedTeam1, setSelectedTeam1] = useState<string>("");
   const [selectedTeam2, setSelectedTeam2] = useState<string>("");
   const [selectedGroup, setSeletectedGroup] = useState<string>("");
+  const auth = getAuth(app);
+  const [authState, setAuthState] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        router.push("/admin");
+      } else {
+        setAuthState(true);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [auth, router]);
 
   useEffect(() => {
     const fetchData = async () => {
