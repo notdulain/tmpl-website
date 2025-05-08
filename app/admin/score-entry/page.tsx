@@ -90,6 +90,7 @@ export default function ScoreEntry() {
   });
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showUndoModal, setShowUndoModal] = useState(false);
+  const [inningComplete, setInningComplete] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -117,29 +118,41 @@ export default function ScoreEntry() {
   };
 
   useEffect(() => {
-    if (matches && matches[selectedMatch as string].status == "live") {
+    if (matches != null && matches[selectedMatch as string].status == "live") {
       setIsLive(true);
     } else {
       setIsLive(false);
     }
   }, [selectedMatch]);
 
-  useEffect(() => {
-    console.log("hellos");
-    if (isLive) {
-      if (matches && matches[selectedMatch as string].status != "live") {
-        const refference = ref(db, `matches/${selectedMatch}`);
-        update(refference, { status: "live" });
-        matches[selectedMatch as string].status = "live";
-      }
+  // useEffect(() => {
+  //   if (isLive) {
+
+  //   }
+  // }, [isLive]);
+
+  const handelLiveButton = () => {
+    if (
+      selectedMatch &&
+      matches &&
+      matches[selectedMatch as string].status != "live"
+    ) {
+      const refference = ref(db, `matches/${selectedMatch}`);
+      update(refference, { status: "live" });
+      matches[selectedMatch as string].status = "live";
+    } else if (
+      selectedMatch &&
+      matches &&
+      matches[selectedMatch as string].status == "live"
+    ) {
+      const refference = ref(db, `matches/${selectedMatch}`);
+      update(refference, { status: "pending" });
+      matches[selectedMatch as string].status = "pending";
     } else {
-      if (matches && matches[selectedMatch as string].status == "live") {
-        const refference = ref(db, `matches/${selectedMatch}`);
-        update(refference, { status: "pending" });
-        matches[selectedMatch as string].status = "pending";
-      }
+      setIsLive(false);
+      window.alert("Please select the match");
     }
-  }, [isLive]);
+  };
 
   // get matches from the database
   useEffect(() => {
@@ -195,9 +208,9 @@ export default function ScoreEntry() {
   }, [selectedMatch]);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchData = async (x: string) => {
       if (selectedMatch && inning != "") {
-        const dbRef = ref(db, `matches/${selectedMatch}/innings/${inning}`);
+        const dbRef = ref(db, `matches/${selectedMatch}/innings/${x}`);
         const snapshot = await get(dbRef);
         if (snapshot.exists()) {
           const data: InningDataProps = snapshot.val();
@@ -213,12 +226,14 @@ export default function ScoreEntry() {
             setNonStriker(batsman2);
           }
           setBowler(data.bowler);
+          setInningComplete(data.completed);
         } else {
-          set(dbRef, inningData);
+          set(ref(db, `matches/${selectedMatch}/innings/1`), inningData);
+          set(ref(db, `matches/${selectedMatch}/innings/2`), inningData);
         }
       }
     };
-    fetchData();
+    fetchData(inning);
   }, [inning]);
 
   useEffect(() => {
@@ -296,6 +311,39 @@ export default function ScoreEntry() {
     }
   }, [bowler]);
 
+  const handleInningCompleteButton = () => {
+    if (selectedMatch && inning != "") {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, complete the match",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          const refference = ref(
+            db,
+            `matches/${selectedMatch}/innings/${inning}`
+          );
+          update(refference, { completed: true });
+          inningData.completed = true;
+          setInningComplete(true);
+
+          Swal.fire({
+            title: "Inining Completed!",
+            text: `${inning} was completed successfully`,
+            icon: "success",
+          });
+        }
+      });
+    } else {
+      setInningComplete(false);
+      window.alert("Please select the match");
+    }
+  };
+
   const handleExtra = (data: InningDataProps) => {
     switch (extraType) {
       case "wide":
@@ -334,6 +382,17 @@ export default function ScoreEntry() {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (inningComplete) {
+      Swal.fire({
+        title: "Error",
+        text: "Can not update the ball because the Inning was completed",
+        icon: "error",
+        confirmButtonColor: "#800000",
+        confirmButtonText: "Continue",
+      });
+      return;
+    }
 
     let data = inningData;
     data.runs = inningData.runs + Number(runs);
@@ -399,7 +458,8 @@ export default function ScoreEntry() {
 
   const handleUndoConfirm = async () => {
     if (selectedMatch && inning && inningData.recentDeliveries.length > 0) {
-      const lastBall = inningData.recentDeliveries[inningData.recentDeliveries.length - 1];
+      const lastBall =
+        inningData.recentDeliveries[inningData.recentDeliveries.length - 1];
       let updatedData = { ...inningData };
 
       // Remove the last ball from recentDeliveries
@@ -432,8 +492,14 @@ export default function ScoreEntry() {
         } else {
           const runs = parseInt(lastBall);
           if (!isNaN(runs)) {
-            updatedData.batsman1Runs = Math.max(0, updatedData.batsman1Runs - runs);
-            updatedData.batsman1Balls = Math.max(0, updatedData.batsman1Balls - 1);
+            updatedData.batsman1Runs = Math.max(
+              0,
+              updatedData.batsman1Runs - runs
+            );
+            updatedData.batsman1Balls = Math.max(
+              0,
+              updatedData.batsman1Balls - 1
+            );
           }
         }
       } else if (updatedData.stricker === updatedData.batsman2) {
@@ -446,8 +512,14 @@ export default function ScoreEntry() {
         } else {
           const runs = parseInt(lastBall);
           if (!isNaN(runs)) {
-            updatedData.batsman2Runs = Math.max(0, updatedData.batsman2Runs - runs);
-            updatedData.batsman2Balls = Math.max(0, updatedData.batsman2Balls - 1);
+            updatedData.batsman2Runs = Math.max(
+              0,
+              updatedData.batsman2Runs - runs
+            );
+            updatedData.batsman2Balls = Math.max(
+              0,
+              updatedData.batsman2Balls - 1
+            );
           }
         }
       }
@@ -464,11 +536,11 @@ export default function ScoreEntry() {
 
       // Show success message
       Swal.fire({
-        title: 'Ball Undone Successfully!',
-        text: 'The last ball has been removed and the score has been updated.',
-        icon: 'success',
-        confirmButtonColor: '#800000',
-        confirmButtonText: 'Continue'
+        title: "Ball Undone Successfully!",
+        text: "The last ball has been removed and the score has been updated.",
+        icon: "success",
+        confirmButtonColor: "#800000",
+        confirmButtonText: "Continue",
       });
     }
     setShowUndoModal(false);
@@ -585,7 +657,10 @@ export default function ScoreEntry() {
                           id="live-toggle"
                           className="sr-only"
                           checked={isLive}
-                          onChange={() => setIsLive(!isLive)}
+                          onChange={() => {
+                            handelLiveButton();
+                            setIsLive(!isLive);
+                          }}
                         />
                         <div className="w-14 h-8 bg-gray-300 rounded-full shadow-inner transition" />
                         <div
@@ -676,6 +751,33 @@ export default function ScoreEntry() {
                       <SelectItem value="bowl">Bowl</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+              </CardContent>
+            </Card>
+            {/* Match and Inning Completed */}
+            <Card className="bg-white border-[#E5E5E5]">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-[#1A1A1A]">
+                  Complete Inning
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="grid grid-cols-2 gap-6">
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label>Complete the Inning</Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className={`h-12 w-full border-2 ${
+                        inningComplete
+                          ? "border-yellow-500 bg-yellow-500 text-white hover:bg-yellow-600 hover:text-white"
+                          : "border-[#E5E5E5] bg-white text-[#1A1A1A] hover:bg-[#F5F5F5]"
+                      }`}
+                      onClick={handleInningCompleteButton}
+                    >
+                      Complete Ining
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>

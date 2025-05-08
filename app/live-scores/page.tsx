@@ -130,19 +130,6 @@ export default function LiveScores() {
     };
   }, []);
 
-  const fetchTeam = async (teamId: string): Promise<TeamProps | null> => {
-    const dbRef = ref(database, `teams/${teamId}`);
-    const snapshot = await get(dbRef);
-    if (snapshot.exists()) {
-      const data = snapshot.val();
-      console.log(data);
-      return data;
-    } else {
-      console.log("doesn't founds");
-      return null;
-    }
-  };
-
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleRefresh = () => {
@@ -150,6 +137,54 @@ export default function LiveScores() {
     setTimeout(() => setIsRefreshing(false), 1000);
   };
 
+  const handleTarget = (match: MatchProp) => {
+    if (match.innings && match.innings[1].completed) {
+      return match.innings[1].runs;
+    }
+    return "";
+  };
+
+  const showWinningTeam = (match: MatchProp) => {
+    const innings = match.innings;
+
+    if (innings == null) return "";
+
+    const firstInning = innings[1];
+    const secondInning = innings[2];
+
+    if (firstInning == null || secondInning == null) return "";
+
+    if (!secondInning.completed) return "";
+
+    const runsToWin = firstInning.runs + 1;
+    const runsScored = secondInning.runs;
+    const wicketsLost = secondInning.wickets;
+    const oversPlayed = secondInning.overs;
+
+    const totalBalls = 4 * 4;
+
+    const ballsLeft = totalBalls - oversPlayed;
+
+    if (runsScored >= runsToWin) {
+      const wicketsRemaining = 10 - wicketsLost;
+      if (secondInning.battingTeam == "team1") {
+        return `${
+          teamNames[match.team1]
+        } won by ${wicketsRemaining} wickets (${ballsLeft} balls left)`;
+      } else {
+        return `${
+          teamNames[match.team2]
+        } won by ${wicketsRemaining} wickets (${ballsLeft} balls left)`;
+      }
+    } else {
+      const runsShort = runsToWin - runsScored;
+      if (firstInning.battingTeam == "team1") {
+        return `${teamNames[match.team1]} won by ${runsShort - 1} runs`;
+      } else {
+        return `${teamNames[match.team2]} won by ${runsShort - 1} runs`;
+      }
+    }
+  };
   return (
     <div className="min-h-screen bg-[#FAF8F5] text-[#1A1A1A]">
       {/* Header */}
@@ -225,6 +260,12 @@ export default function LiveScores() {
                       </h1>
                     </div>
                   </div>
+                  <div className="flex justify-between items-center">
+                    <div></div>
+                    <p className="font-bold text-lg text-right">
+                      Target: {handleTarget(match)}
+                    </p>
+                  </div>
 
                   {match.innings &&
                     (() => {
@@ -285,14 +326,15 @@ export default function LiveScores() {
                                         teamData[inning.battingTeam === "team1" ? match.team1 : match.team2]?.[inning.batsman1];
                                     })()}
                                   </span>
-                                  {inning.stricker == inning.batsman1 && (
-                                    <Badge
-                                      variant="outline"
-                                      className="text-xs md:text-sm border-[#800000] text-[#800000]"
-                                    >
-                                      Striker
-                                    </Badge>
-                                  )}
+                                  {inning.stricker == inning.batsman1 &&
+                                    inning.stricker != "" && (
+                                      <Badge
+                                        variant="outline"
+                                        className="text-xs md:text-sm border-[#800000] text-[#800000]"
+                                      >
+                                        Striker
+                                      </Badge>
+                                    )}
                                 </div>
                               </div>
                               <div className="text-right">
@@ -311,14 +353,15 @@ export default function LiveScores() {
                                     {inning.batsman2 &&
                                       teamData[inning.battingTeam === "team1" ? match.team1 : match.team2]?.[inning.batsman2]}
                                   </span>
-                                  {inning.stricker == inning.batsman2 && (
-                                    <Badge
-                                      variant="outline"
-                                      className="text-xs md:text-sm border-[#800000] text-[#800000]"
-                                    >
-                                      Striker
-                                    </Badge>
-                                  )}
+                                  {inning.stricker == inning.batsman2 &&
+                                    inning.stricker != "" && (
+                                      <Badge
+                                        variant="outline"
+                                        className="text-xs md:text-sm border-[#800000] text-[#800000]"
+                                      >
+                                        Striker
+                                      </Badge>
+                                    )}
                                 </div>
                               </div>
                               <div className="text-right">
@@ -416,6 +459,9 @@ export default function LiveScores() {
                               </div>
                             </div>
                           </div>
+                          <div className="mt-5 font-medium self-center text-center">
+                            {showWinningTeam(match)}
+                          </div>
                         </div>
                       );
                     })()}
@@ -440,15 +486,41 @@ export default function LiveScores() {
                     className="bg-white border-[#E5E5E5] shadow-sm"
                   >
                     <CardContent className="p-4">
-                      <div className="flex justify-between items-center mb-2">
-                        <div className="text-sm text-[#666666]">date</div>
-                        <Badge
-                          variant="outline"
-                          className="text-xs border-[#800000] text-[#800000]"
-                        >
-                          Completed
-                        </Badge>
-                      </div>
+                      {match.innings &&
+                        (() => {
+                          const inning1: InningDataProps = match?.innings[1];
+                          const inning2: InningDataProps = match?.innings[2];
+
+                          if (inning1.completed && inning2.completed) {
+                            return (
+                              <div className="flex justify-between items-center mb-2">
+                                <div className="text-sm text-[#666666]">
+                                  date
+                                </div>
+                                <Badge
+                                  variant="outline"
+                                  className="text-xs border-[#800000] text-[#800000]"
+                                >
+                                  Completed
+                                </Badge>
+                              </div>
+                            );
+                          } else {
+                            return (
+                              <div className="flex justify-between items-center mb-2">
+                                <div className="text-sm text-[#666666]">
+                                  date
+                                </div>
+                                <Badge
+                                  variant="outline"
+                                  className="text-xs border-[#800000] text-[#800000]"
+                                >
+                                  Pending
+                                </Badge>
+                              </div>
+                            );
+                          }
+                        })()}
                       <div className="space-y-2">
                         <div className="flex justify-between items-center">
                           <div className="flex-1">
@@ -495,9 +567,12 @@ export default function LiveScores() {
                           </div>
                         </div>
                       </div>
-                      <div className="mt-2 text-sm font-medium text-[#800000]">
-                        {match.status}
+                      <div className="mt-2 font-medium self-center">
+                        {showWinningTeam(match)}
                       </div>
+                      {/* <div className="mt-2 text-sm font-medium text-[#800000]">
+                        {match.status}
+                      </div> */}
                     </CardContent>
                   </Card>
                 ) : (
