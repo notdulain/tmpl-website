@@ -85,7 +85,9 @@ export default function FinalPage() {
       set(refference, finalsData);
     };
 
-    saveFinalsData();
+    if(finalsData){
+      saveFinalsData();
+    }
   }, [finalsData]);
 
   return (
