@@ -66,9 +66,9 @@ export default function FinalPage() {
         const snapshot = await get(dbRef);
         if (snapshot.exists()) {
           const data = snapshot.val();
-          const keys = Object.keys(data);
-          console.log("Fetched teams:", keys); // Debug log
-          setTeams(keys);
+          const teamNames = Object.values(data).map((team: any) => team.name);
+          console.log("Fetched team names:", teamNames); // Debug log
+          setTeams(teamNames);
         } else {
           console.log("No teams found in database");
         }
