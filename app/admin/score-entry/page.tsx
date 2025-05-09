@@ -697,11 +697,9 @@ export default function ScoreEntry() {
                     value={tossWinner}
                     onValueChange={(value) => {
                       if (matches && selectedMatch) {
-                        const matchData = { ...matches[selectedMatch] };
-                        matchData.toss = value;
                         setTossWinner(value);
                         const refference = ref(db, `matches/${selectedMatch}`);
-                        set(refference, matchData);
+                        update(refference, {toss: `${value}`})
                       }
                     }}
                   >
@@ -730,11 +728,10 @@ export default function ScoreEntry() {
                     value={tossDecision}
                     onValueChange={(value) => {
                       if (matches && selectedMatch) {
-                        const matchData = { ...matches[selectedMatch] };
-                        matchData.tossDecision = value;
                         setTossDecision(value);
                         const refference = ref(db, `matches/${selectedMatch}`);
-                        set(refference, matchData);
+                        update(refference, {tossDecision: `${value}`})
+
                       }
                     }}
                   >

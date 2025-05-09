@@ -147,7 +147,7 @@ importers:
         specifier: ^1.7.1
         version: 1.7.4(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       sweetalert2:
-        specifier: ^11.21.0
+        specifier: ^11.6.13
         version: 11.21.0
       tailwind-merge:
         specifier: ^2.5.5
