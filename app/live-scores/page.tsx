@@ -11,27 +11,7 @@ import { app } from "@/lib/firebase";
 import { get, getDatabase, onValue, ref, set } from "firebase/database";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-interface InningDataProps {
-  battingTeam: string;
-  runs: number;
-  wickets: number;
-  overs: number;
-  stricker: string;
-  batsman1: string;
-  batsman2: string;
-  batsman1Runs: number;
-  batsman1Balls: number;
-  batsman2Runs: number;
-  batsman2Balls: number;
-  bowler: string;
-  wides: number;
-  noBals: number;
-  byes: number;
-  legByes: number;
-  completed: boolean;
-  completedAt?: number;
-  recentDeliveries: string[];
-}
+import { InningDataProps } from "../types/interfaces";
 
 interface MatchProp {
   team1: string;
@@ -144,6 +124,16 @@ export default function LiveScores() {
       return match.innings[1].runs;
     }
     return "";
+  };
+
+  const showTossWinner = (match: MatchProp) => {
+    if (match.toss != "" && match.tossDecision != "") {
+      return `${teamNames[match.toss]} won the toss and decided to ${
+        match.tossDecision
+      }`;
+    } else {
+      return "";
+    }
   };
 
   const showWinningTeam = (match: MatchProp) => {
@@ -481,7 +471,7 @@ export default function LiveScores() {
                             </div>
                           </div>
                           <div className="mt-5 font-medium self-center text-center">
-                            {showWinningTeam(match)}
+                            {showWinningTeam(match) || showTossWinner(match)}
                           </div>
                         </div>
                       );

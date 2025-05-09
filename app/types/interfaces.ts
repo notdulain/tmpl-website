@@ -10,6 +10,7 @@ export interface MatchProp {
 export interface TeamProps {
     [key: string]: string;
     name: string;
+    group: string;
     member1: string;
     member2: string;
     member3: string;
