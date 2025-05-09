@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 import { TeamProps, InningDataProps } from "../types/interfaces";
+import { Bracket } from "@/components/finalTree";
 
 interface MatchProp {
   team1: string;
@@ -431,6 +432,7 @@ export default function LeaderboardPage() {
             </div>
           </div>
         </div>
+        <Bracket />
       </div>
     </div>
   );
