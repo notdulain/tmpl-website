@@ -144,6 +144,16 @@ export default function LiveScores() {
     return "";
   };
 
+  const showTossWinner = (match: MatchProp) => {
+    if (match.toss != "" && match.tossDecision != "") {
+      return `${teamNames[match.toss]} won the toss and decided to ${
+        match.tossDecision
+      }`;
+    } else {
+      return "";
+    }
+  };
+
   const showWinningTeam = (match: MatchProp) => {
     const innings = match.innings;
 
@@ -479,7 +489,7 @@ export default function LiveScores() {
                             </div>
                           </div>
                           <div className="mt-5 font-medium self-center text-center">
-                            {showWinningTeam(match)}
+                            {showWinningTeam(match) || showTossWinner(match)}
                           </div>
                         </div>
                       );
