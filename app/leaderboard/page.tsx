@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Trophy, Info } from "lucide-react";
-import { get, getDatabase, ref } from "firebase/database";
+import { get, getDatabase, ref, onValue } from "firebase/database";
 import { app } from "@/lib/firebase";
 
 import { TeamProps, InningDataProps } from "../types/interfaces";
@@ -53,15 +53,16 @@ export default function LeaderboardPage() {
 
       // Fetch all teams from the database
       const teamsRef = ref(db, "teams");
-      const snapshot = await get(teamsRef);
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        Object.keys(data).forEach((teamId) => {
-          teams[teamId] = data[teamId];
-        });
-      }
-      console.log(teams);
-      setTeamData(teams);
+      onValue(teamsRef, (snapshot) => {
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          Object.keys(data).forEach((teamId) => {
+            teams[teamId] = data[teamId];
+          });
+          console.log(teams);
+          setTeamData(teams);
+        }
+      });
     };
 
     fetchTeamData();
@@ -73,15 +74,16 @@ export default function LeaderboardPage() {
 
       // Fetch all matches from the database
       const matchesRef = ref(db, "matches");
-      const snapshot = await get(matchesRef);
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        Object.keys(data).forEach((matchId) => {
-          matches[matchId] = data[matchId];
-        });
-      }
-      console.log(matches);
-      setMatchData(matches);
+      onValue(matchesRef, (snapshot) => {
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          Object.keys(data).forEach((matchId) => {
+            matches[matchId] = data[matchId];
+          });
+          console.log(matches)
+          setMatchData(matches);
+        }
+      });
     };
 
     fetchMatchData();
@@ -241,6 +243,9 @@ console.log(stats)
                     <th className="px-6 py-3 text-center text-sm font-semibold text-[#2C2C2C]">
                       Pts
                     </th>
+                    <th className="px-6 py-3 text-center text-sm font-semibold text-[#2C2C2C]">
+                      NRR
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#E6E6E6]">
@@ -266,6 +271,9 @@ console.log(stats)
                         </td>
                         <td className="px-6 py-4 text-sm text-center font-bold text-[#800000]">
                           {team.pts}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-center text-[#444444]">
+                          0.000
                         </td>
                       </tr>
                     ))}
@@ -303,6 +311,9 @@ console.log(stats)
                     <th className="px-6 py-3 text-center text-sm font-semibold text-[#2C2C2C]">
                       Pts
                     </th>
+                    <th className="px-6 py-3 text-center text-sm font-semibold text-[#2C2C2C]">
+                      NRR
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#E6E6E6]">
@@ -328,6 +339,9 @@ console.log(stats)
                         </td>
                         <td className="px-6 py-4 text-sm text-center font-bold text-[#800000]">
                           {team.pts}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-center text-[#444444]">
+                          0.000
                         </td>
                       </tr>
                     ))}
