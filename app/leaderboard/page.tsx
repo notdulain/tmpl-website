@@ -24,22 +24,24 @@ export default function LeaderboardPage() {
   const db = getDatabase(app);
   const [teamData, setTeamData] = useState<Record<string, TeamProps>>({});
   const [matchData, setMatchData] = useState<Record<string, MatchProp>>({});
-  const [stats, setStats] = useState<Record<
-    string,
-    {
-      teamname: string;
-      group: string;
-      played: number;
-      wins: number;
-      losses: number;
-      pts: number;
-      totalRunsScored: number;
-      totalOversFaced: number;
-      totalRunsConceded: number;
-      totalOversBowled: number;
-      nrr: number;
-    }
-  >>({});
+  const [stats, setStats] = useState<
+    Record<
+      string,
+      {
+        teamname: string;
+        group: string;
+        played: number;
+        wins: number;
+        losses: number;
+        pts: number;
+        totalRunsScored: number;
+        totalOversFaced: number;
+        totalRunsConceded: number;
+        totalOversBowled: number;
+        nrr: number;
+      }
+    >
+  >({});
   useEffect(() => {
     const fetchTeamData = async () => {
       const teams: Record<string, TeamProps> = {};
@@ -73,7 +75,7 @@ export default function LeaderboardPage() {
           Object.keys(data).forEach((matchId) => {
             matches[matchId] = data[matchId];
           });
-          console.log(matches)
+          console.log(matches);
           setMatchData(matches);
         }
       });
@@ -85,9 +87,7 @@ export default function LeaderboardPage() {
   useEffect(() => {
     if (matchData) {
       if (teamData) {
-        if (Object.keys(stats).length === 0) {
-          calculateTeamStats(matchData);
-        }
+        calculateTeamStats(matchData);
       }
     }
   }, [matchData]);
@@ -95,37 +95,40 @@ export default function LeaderboardPage() {
   const getTeamName = (match: MatchProp, teamId: string) => {
     if (teamId == match.team1) {
       return match.team1;
-    }else{
-      return match.team2
+    } else {
+      return match.team2;
     }
   };
 
   const getTeamName2 = (match: MatchProp, teamId: string) => {
     if (teamId == "team1") {
       return match.team1;
-    }else{
-      return match.team2
+    } else {
+      return match.team2;
     }
   };
 
   const calculateTeamStats = (matches: Record<string, MatchProp>) => {
-    const newStats: Record<string, {
-      teamname: string;
-      group: string;
-      played: number;
-      wins: number;
-      losses: number;
-      pts: number;
-      totalRunsScored: number;
-      totalOversFaced: number;
-      totalRunsConceded: number;
-      totalOversBowled: number;
-      nrr: number;
-    }> = {};
+    const newStats: Record<
+      string,
+      {
+        teamname: string;
+        group: string;
+        played: number;
+        wins: number;
+        losses: number;
+        pts: number;
+        totalRunsScored: number;
+        totalOversFaced: number;
+        totalRunsConceded: number;
+        totalOversBowled: number;
+        nrr: number;
+      }
+    > = {};
 
     Object.values(matches).forEach((match) => {
       const { team1, team2, innings } = match;
-      
+
       // Initialize stats for both teams if not already present
       if (!newStats[team1])
         newStats[team1] = {
@@ -139,7 +142,7 @@ export default function LeaderboardPage() {
           totalOversFaced: 0,
           totalRunsConceded: 0,
           totalOversBowled: 0,
-          nrr: 0
+          nrr: 0,
         };
       if (!newStats[team2])
         newStats[team2] = {
@@ -153,7 +156,7 @@ export default function LeaderboardPage() {
           totalOversFaced: 0,
           totalRunsConceded: 0,
           totalOversBowled: 0,
-          nrr: 0
+          nrr: 0,
         };
 
       // Check if the team has scored in the innings before incrementing played count
@@ -214,8 +217,14 @@ export default function LeaderboardPage() {
     Object.keys(newStats).forEach((team) => {
       const stats = newStats[team];
       // Calculate NRR using the formula: (runs scored/overs faced) - (runs conceded/overs bowled)
-      const runRateScored = stats.totalOversFaced > 0 ? stats.totalRunsScored / (stats.totalOversFaced / 4) : 0;
-      const runRateConceded = stats.totalOversBowled > 0 ? stats.totalRunsConceded / (stats.totalOversBowled / 4) : 0;
+      const runRateScored =
+        stats.totalOversFaced > 0
+          ? stats.totalRunsScored / (stats.totalOversFaced / 4)
+          : 0;
+      const runRateConceded =
+        stats.totalOversBowled > 0
+          ? stats.totalRunsConceded / (stats.totalOversBowled / 4)
+          : 0;
       stats.nrr = Number((runRateScored - runRateConceded).toFixed(3));
     });
 
@@ -224,13 +233,13 @@ export default function LeaderboardPage() {
       newStats[team].pts = newStats[team].wins * 2;
     });
 
-    console.log(newStats)
+    console.log(newStats);
     setStats(newStats);
     return newStats;
   };
-  useEffect(()=>{
-console.log(stats)
-  },[stats])
+  useEffect(() => {
+    console.log(stats);
+  }, [stats]);
 
   return (
     <div className="min-h-screen bg-[#FAF9F6] text-[#2C2C2C]">
@@ -294,10 +303,13 @@ console.log(stats)
                 </thead>
                 <tbody className="divide-y divide-[#E6E6E6]">
                   {Object.values(stats)
-                    .filter(team => team.group === "group1")
+                    .filter((team) => team.group === "group1")
                     .sort((a, b) => b.pts - a.pts)
                     .map((team, index) => (
-                      <tr key={team.teamname} className="hover:bg-[#f9f6f5] transition-colors">
+                      <tr
+                        key={team.teamname}
+                        className="hover:bg-[#f9f6f5] transition-colors"
+                      >
                         <td className="px-6 py-4 text-sm text-center font-medium text-[#444444]">
                           {index + 1}
                         </td>
@@ -362,10 +374,13 @@ console.log(stats)
                 </thead>
                 <tbody className="divide-y divide-[#E6E6E6]">
                   {Object.values(stats)
-                    .filter(team => team.group === "group2")
+                    .filter((team) => team.group === "group2")
                     .sort((a, b) => b.pts - a.pts)
                     .map((team, index) => (
-                      <tr key={team.teamname} className="hover:bg-[#f9f6f5] transition-colors">
+                      <tr
+                        key={team.teamname}
+                        className="hover:bg-[#f9f6f5] transition-colors"
+                      >
                         <td className="px-6 py-4 text-sm text-center font-medium text-[#444444]">
                           {index + 1}
                         </td>

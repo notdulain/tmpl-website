@@ -183,6 +183,12 @@ export default function Matches() {
                     <SelectItem key="GROUP 2" value="GROUP 2">
                       GROUP 2
                     </SelectItem>
+                    <SelectItem key="GROUP 2" value="GROUP 2">
+                      SEMI FINALS
+                    </SelectItem>
+                    <SelectItem key="GROUP 2" value="GROUP 2">
+                      FINALS
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
