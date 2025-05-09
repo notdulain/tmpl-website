@@ -83,11 +83,34 @@ export default function Matches() {
       tossDecision: "pending",
     };
 
+    const inningData: InningDataProps = {
+      battingTeam: "",
+      runs: 0,
+      wickets: 0,
+      overs: 0.0,
+      stricker: "",
+      batsman1: "",
+      batsman2: "",
+      batsman1Runs: 0,
+      batsman1Balls: 0,
+      batsman2Runs: 0,
+      batsman2Balls: 0,
+      bowler: "",
+      wides: 0,
+      noBals: 0,
+      byes: 0,
+      legByes: 0,
+      completed: false,
+      recentDeliveries: [],
+    };
+
     console.log(matchData);
 
     if (mathId) {
       const refference = ref(db, `matches/${mathId}`);
       set(refference, matchData);
+      set(ref(db, `matches/${mathId}/innings/1`), inningData);
+      set(ref(db, `matches/${mathId}/innings/2`), inningData);
       // Clear the form
       form.reset();
       setSelectedTeam1("");
