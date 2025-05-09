@@ -327,12 +327,12 @@ export default function ScoreEntry() {
             db,
             `matches/${selectedMatch}/innings/${inning}`
           );
-          update(refference, { 
+          update(refference, {
             completed: true,
-            completedAt: Date.now()  // Add timestamp when completing
+            completedAt: Date.now(), // Add timestamp when completing
           });
           inningData.completed = true;
-          inningData.completedAt = Date.now();  // Update local state
+          inningData.completedAt = Date.now(); // Update local state
           setInningComplete(true);
           setInning("");
           setBattingTeam("");
@@ -595,11 +595,12 @@ export default function ScoreEntry() {
               <div className="text-right">
                 <div className="text-sm text-[#666666]">Current Score</div>
                 <div className="text-xl font-bold text-[#800000]">
-                  {inningData.runs}/{inningData.wickets} ({parseFloat(
-                      `${Math.floor(inningData.overs / 4)}.${
-                        (inningData.overs % 4)
-                      }`
-                    )}
+                  {inningData.runs}/{inningData.wickets} (
+                  {parseFloat(
+                    `${Math.floor(inningData.overs / 4)}.${
+                      inningData.overs % 4
+                    }`
+                  )}
                   )
                 </div>
               </div>
@@ -702,7 +703,7 @@ export default function ScoreEntry() {
                       if (matches && selectedMatch) {
                         setTossWinner(value);
                         const refference = ref(db, `matches/${selectedMatch}`);
-                        update(refference, {toss: `${value}`})
+                        update(refference, { toss: `${value}` });
                       }
                     }}
                   >
@@ -733,8 +734,7 @@ export default function ScoreEntry() {
                       if (matches && selectedMatch) {
                         setTossDecision(value);
                         const refference = ref(db, `matches/${selectedMatch}`);
-                        update(refference, {tossDecision: `${value}`})
-
+                        update(refference, { tossDecision: `${value}` });
                       }
                     }}
                   >
@@ -1118,20 +1118,29 @@ export default function ScoreEntry() {
               </Button>
             </div>
           </form>
-          <Button
-            variant="outline"
-            className="w-full bg-green-600 hover:bg-green-700 text-white mt-4"
-            onClick={() => router.push("/admin/register")}
-          >
-            Register a new team
-          </Button>
-          <Button
-            variant="outline"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white mt-4"
-            onClick={() => router.push("/admin/matches")}
-          >
-            Create a match
-          </Button>
+          <div className="flex flex-row gap-3">
+            <Button
+              variant="outline"
+              className="w-full bg-green-600 hover:bg-green-700 text-white mt-4"
+              onClick={() => router.push("/admin/register")}
+            >
+              Register a new team
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white mt-4"
+              onClick={() => router.push("/admin/matches")}
+            >
+              Create a match
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full bg-yellow-600 hover:bg-yellow-700 text-white mt-4"
+              onClick={() => router.push("/admin/finals")}
+            >
+              Final Socre Board
+            </Button>
+          </div>
         </main>
 
         {/* Undo Modal */}
