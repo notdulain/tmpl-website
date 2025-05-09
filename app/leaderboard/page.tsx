@@ -36,7 +36,7 @@ export default function LeaderboardPage() {
   const db = getDatabase(app);
   const [teamData, setTeamData] = useState<Record<string, TeamProps>>({});
   const [matchData, setMatchData] = useState<Record<string, MatchProp>>({});
-  const stats: Record<
+  const [stats, setStats] = useState<Record<
     string,
     {
       teamname: string;
@@ -46,7 +46,7 @@ export default function LeaderboardPage() {
       losses: number;
       pts: number;
     }
-  > = {};
+  >>({});
   useEffect(() => {
     const fetchTeamData = async () => {
       const teams: Record<string, TeamProps> = {};
@@ -98,31 +98,47 @@ export default function LeaderboardPage() {
   }, [matchData]);
 
   const getTeamName = (match: MatchProp, teamId: string) => {
+    if (teamId == match.team1) {
+      return match.team1;
+    }else{
+      return match.team2
+    }
+  };
+
+  const getTeamName2 = (match: MatchProp, teamId: string) => {
     if (teamId == "team1") {
       return match.team1;
-    } else {
-      return match.team2;
+    }else{
+      return match.team2
     }
   };
 
   const calculateTeamStats = (matches: Record<string, MatchProp>) => {
+    const newStats: Record<string, {
+      teamname: string;
+      group: string;
+      played: number;
+      wins: number;
+      losses: number;
+      pts: number;
+    }> = {};
+
     Object.values(matches).forEach((match) => {
-      console.log(match);
       const { team1, team2, innings } = match;
       // Initialize stats for both teams if not already present
-      if (!stats[team1])
-        stats[team1] = {
-          teamname: getTeamName(match, team1),
+      if (!newStats[team1])
+        newStats[team1] = {
+          teamname: getTeamName(match, team1) || "",
           group: teamData[getTeamName(match, team1)]?.group || "",
           played: 0,
           wins: 0,
           losses: 0,
           pts: 0,
         };
-      if (!stats[team2])
-        stats[team2] = {
-          teamname: getTeamName(match, team2),
-          group: teamData[getTeamName(match, team1)]?.group || "",
+      if (!newStats[team2])
+        newStats[team2] = {
+          teamname: teamData[getTeamName(match, team2)]?.name || "",
+          group: teamData[getTeamName(match, team2)]?.group || "",
           played: 0,
           wins: 0,
           losses: 0,
@@ -132,55 +148,58 @@ export default function LeaderboardPage() {
       // Check if the team has scored in the innings before incrementing played count
       innings.forEach((inning) => {
         if (
-          getTeamName(match, inning?.battingTeam) === team1 &&
+          getTeamName2(match, inning?.battingTeam) === team1 &&
           inning.completed
         ) {
-          stats[team1].played += 1;
+          newStats[team1].played += 1;
         }
         if (
-          getTeamName(match, inning?.battingTeam) === team2 &&
+          getTeamName2(match, inning?.battingTeam) === team2 &&
           inning.completed
         ) {
-          stats[team2].played += 1;
+          newStats[team2].played += 1;
         }
       });
 
-      // Determine the winner based on innings data
-      // let team1Inning: InningDataProps | null = null;
-      // let team2Inning: InningDataProps | null = null;
       let team1Score = 0;
       let team2Score = 0;
 
       innings.forEach((inning: InningDataProps) => {
         if (
-          getTeamName(match, inning?.battingTeam) === team1 &&
+          getTeamName2(match, inning?.battingTeam) === team1 &&
           inning.completed
         ) {
           team1Score = inning.runs;
         } else if (
-          getTeamName(match, inning?.battingTeam) === team2 &&
+          getTeamName2(match, inning?.battingTeam) === team2 &&
           inning.completed
         ) {
-          team2Score - inning.runs;
+          team2Score = inning.runs;
         }
       });
 
       if (team1Score > team2Score) {
-        stats[team1].wins += 1;
-        stats[team2].losses += 1;
+        newStats[team1].wins += 1;
+        newStats[team2].losses += 1;
       } else if (team2Score > team1Score) {
-        stats[team2].wins += 1;
-        stats[team1].losses += 1;
+        newStats[team2].wins += 1;
+        newStats[team1].losses += 1;
       }
     });
 
     // Assign points based on wins
-    Object.keys(stats).forEach((team) => {
-      stats[team].pts = stats[team].wins * 2;
+    Object.keys(newStats).forEach((team) => {
+      newStats[team].pts = newStats[team].wins * 2;
     });
-    console.log(stats);
-    return stats;
+
+    console.log(newStats)
+
+    setStats(newStats);
+    return newStats;
   };
+  useEffect(()=>{
+console.log(stats)
+  },[stats])
 
   return (
     <div className="min-h-screen bg-[#FAF9F6] text-[#2C2C2C]">
@@ -225,31 +244,31 @@ export default function LeaderboardPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#E6E6E6]">
-                  {mockData.groupA.map((team, index) => (
-                    <tr
-                      key={team.name}
-                      className="hover:bg-[#f9f6f5] transition-colors"
-                    >
-                      <td className="px-6 py-4 text-sm text-center font-medium text-[#444444]">
-                        {index + 1}
-                      </td>
-                      <td className="px-6 py-4 text-sm font-medium text-[#2C2C2C]">
-                        {team.name}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-center text-[#444444]">
-                        {team.played}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-center text-[#444444]">
-                        {team.wins}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-center text-[#444444]">
-                        {team.losses}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-center font-bold text-[#800000]">
-                        {team.points}
-                      </td>
-                    </tr>
-                  ))}
+                  {Object.values(stats)
+                    .filter(team => team.group === "group1")
+                    .sort((a, b) => b.pts - a.pts)
+                    .map((team, index) => (
+                      <tr key={team.teamname} className="hover:bg-[#f9f6f5] transition-colors">
+                        <td className="px-6 py-4 text-sm text-center font-medium text-[#444444]">
+                          {index + 1}
+                        </td>
+                        <td className="px-6 py-4 text-sm font-medium text-[#2C2C2C]">
+                          {team.teamname}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-center text-[#444444]">
+                          {team.played}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-center text-[#444444]">
+                          {team.wins}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-center text-[#444444]">
+                          {team.losses}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-center font-bold text-[#800000]">
+                          {team.pts}
+                        </td>
+                      </tr>
+                    ))}
                 </tbody>
               </table>
             </div>
@@ -287,31 +306,31 @@ export default function LeaderboardPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#E6E6E6]">
-                  {mockData.groupB.map((team, index) => (
-                    <tr
-                      key={team.name}
-                      className="hover:bg-[#f9f6f5] transition-colors"
-                    >
-                      <td className="px-6 py-4 text-sm text-center font-medium text-[#444444]">
-                        {index + 1}
-                      </td>
-                      <td className="px-6 py-4 text-sm font-medium text-[#2C2C2C]">
-                        {team.name}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-center text-[#444444]">
-                        {team.played}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-center text-[#444444]">
-                        {team.wins}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-center text-[#444444]">
-                        {team.losses}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-center font-bold text-[#800000]">
-                        {team.points}
-                      </td>
-                    </tr>
-                  ))}
+                  {Object.values(stats)
+                    .filter(team => team.group === "group2")
+                    .sort((a, b) => b.pts - a.pts)
+                    .map((team, index) => (
+                      <tr key={team.teamname} className="hover:bg-[#f9f6f5] transition-colors">
+                        <td className="px-6 py-4 text-sm text-center font-medium text-[#444444]">
+                          {index + 1}
+                        </td>
+                        <td className="px-6 py-4 text-sm font-medium text-[#2C2C2C]">
+                          {team.teamname}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-center text-[#444444]">
+                          {team.played}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-center text-[#444444]">
+                          {team.wins}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-center text-[#444444]">
+                          {team.losses}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-center font-bold text-[#800000]">
+                          {team.pts}
+                        </td>
+                      </tr>
+                    ))}
                 </tbody>
               </table>
             </div>
