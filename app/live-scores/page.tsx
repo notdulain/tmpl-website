@@ -368,7 +368,7 @@ export default function LiveScores() {
                                       inning.overs % 4
                                     }`
                                   )}
-                                  /4.0
+                                  /5.0
                                 </div>
                               </div>
                             </div>
