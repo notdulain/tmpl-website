@@ -10,26 +10,7 @@ import { useEffect, useState } from "react";
 import { app } from "@/lib/firebase";
 import { get, getDatabase, onValue, ref, set } from "firebase/database";
 
-interface InningDataProps {
-  battingTeam: string;
-  runs: number;
-  wickets: number;
-  overs: number;
-  stricker: string;
-  batsman1: string;
-  batsman2: string;
-  batsman1Runs: number;
-  batsman1Balls: number;
-  batsman2Runs: number;
-  batsman2Balls: number;
-  bowler: string;
-  wides: number;
-  noBals: number;
-  byes: number;
-  legByes: number;
-  completed: boolean;
-  recentDeliveries: string[];
-}
+import { InningDataProps } from "../types/interfaces";
 
 interface MatchProp {
   team1: string;

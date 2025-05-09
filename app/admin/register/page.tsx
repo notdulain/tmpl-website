@@ -11,15 +11,24 @@ import { Label } from "@/components/ui/label";
 import { ArrowLeft } from "lucide-react";
 
 import { TeamProps } from "@/app/types/interfaces";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function Register() {
   const db = getDatabase(app);
   const router = useRouter();
   const auth = getAuth(app);
   const [authState, setAuthState] = useState(false);
+  const [selectedGroup, setSeletectedGroup] = useState<string>("");
 
   const [teamData, setTeamData] = useState<TeamProps>({
     name: "",
+    group: "",
     member1: "",
     member2: "",
     member3: "",
@@ -57,6 +66,7 @@ export default function Register() {
       setTeamId(null);
       setTeamData({
         name: "",
+        group: "",
         member1: "",
         member2: "",
         member3: "",
@@ -147,6 +157,30 @@ export default function Register() {
                     value={teamData.name}
                     onChange={handleChange}
                   />
+                </div>
+                <div>
+                  <Label htmlFor="name">Group Name</Label>
+                  <Select
+                    name="group"
+                    required
+                    value={selectedGroup}
+                    onValueChange={(value) => {
+                      setTeamData({ ...teamData, group: value });
+                      setSeletectedGroup(value);
+                    }}
+                  >
+                    <SelectTrigger className="bg-white border-[#E5E5E5]">
+                      <SelectValue placeholder="Select a Team" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem key="Group1" value="Group1">
+                        Group 1
+                      </SelectItem>
+                      <SelectItem key="Group2" value="Group2">
+                        Group 2
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 
