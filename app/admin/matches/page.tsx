@@ -177,11 +177,11 @@ export default function Matches() {
                     <SelectValue placeholder="Select a Team" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem key="GROUP A" value="GROUP A">
-                      GROUP A
+                    <SelectItem key="GROUP 1" value="GROUP 1">
+                      GROUP 1
                     </SelectItem>
-                    <SelectItem key="GROUP B" value="GROUP B">
-                      GROUP B
+                    <SelectItem key="GROUP 2" value="GROUP 2">
+                      GROUP 2
                     </SelectItem>
                   </SelectContent>
                 </Select>
