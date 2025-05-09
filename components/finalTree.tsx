@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { Trophy, Award } from "lucide-react";
+import { getDatabase, onValue, ref } from "firebase/database";
+import { FinalsProp } from "@/app/types/interfaces";
 
 const group1Teams = ["Central Link", "Colombo", "Team C", "Team D"];
 const group2Teams = ["Jaffna", "Trinco", "Team E", "Team F"];
@@ -17,12 +19,24 @@ const semiFinals = [
 const final = ["Winner SF1", "Winner SF2"];
 
 export const Bracket = () => {
-  // Use ref to position lines correctly after render
   const [bracketMounted, setBracketMounted] = React.useState(false);
-  
+  const [finals, setFinals] = useState<FinalsProp>();
+
   React.useEffect(() => {
     // Set bracket as mounted after initial render to ensure DOM elements are available
     setBracketMounted(true);
+  }, []);
+
+  useEffect(() => {
+    const db = getDatabase();
+    const finalsRef = ref(db, "finals");
+
+    onValue(finalsRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        setFinals(data);
+      }
+    });
   }, []);
 
   return (
@@ -43,9 +57,9 @@ export const Bracket = () => {
           <div className="relative grid grid-cols-5 gap-4 sm:gap-8 md:gap-12">
             {/* Group 1 Teams */}
             <div className="flex flex-col justify-center items-center">
-              <Stage 
-                title="Group 1" 
-                teams={group1Teams} 
+              <Stage
+                title="Group 1"
+                teams={group1Teams}
                 highlights={[0, 1]} // Highlight 1st and 2nd place
                 badges={["1", "2", "", ""]} // Add position badges
               />
@@ -53,8 +67,8 @@ export const Bracket = () => {
 
             {/* Semi Finals Left */}
             <div className="flex flex-col justify-center items-center">
-              <MatchPair 
-                title="Semi Final 1" 
+              <MatchPair
+                title="Semi Final 1"
                 teams={semiFinals[0]}
                 subtitle="#1 of Group-1 vs #2 of Group-2"
               />
@@ -62,8 +76,8 @@ export const Bracket = () => {
 
             {/* Final */}
             <div className="flex flex-col justify-center items-center">
-              <MatchPair 
-                title="Final" 
+              <MatchPair
+                title="Final"
                 teams={final}
                 align="center"
                 isHorizontal={true}
@@ -73,8 +87,8 @@ export const Bracket = () => {
 
             {/* Semi Finals Right */}
             <div className="flex flex-col justify-center items-center">
-              <MatchPair 
-                title="Semi Final 2" 
+              <MatchPair
+                title="Semi Final 2"
                 teams={semiFinals[1]}
                 subtitle="#2 of Group-1 vs #1 of Group-2"
               />
@@ -82,8 +96,8 @@ export const Bracket = () => {
 
             {/* Group 2 Teams */}
             <div className="flex flex-col justify-center items-center">
-              <Stage 
-                title="Group 2" 
+              <Stage
+                title="Group 2"
                 teams={group2Teams}
                 highlights={[0, 1]} // Highlight 1st and 2nd place
                 badges={["1", "2", "", ""]} // Add position badges
@@ -112,10 +126,10 @@ const Stage = ({
   badges?: string[];
 }) => (
   <div className="flex flex-col items-center gap-2 sm:gap-3">
-    <div className="text-sm sm:text-base font-semibold text-[#800000] mb-1 sm:mb-2">{title}</div>
-    {subtitle && (
-      <div className="text-xs text-[#666666] mb-1">{subtitle}</div>
-    )}
+    <div className="text-sm sm:text-base font-semibold text-[#800000] mb-1 sm:mb-2">
+      {title}
+    </div>
+    {subtitle && <div className="text-xs text-[#666666] mb-1">{subtitle}</div>}
     <div className="flex flex-col gap-2 sm:gap-3">
       {teams.map((team, i) => (
         <div
@@ -152,20 +166,28 @@ const MatchPair = ({
   isFinal?: boolean;
 }) => {
   const teamPairRef = useRef<HTMLDivElement>(null);
-  
+
   useEffect(() => {
     // This effect is for future line position calculations if needed
   }, []);
-  
+
   return (
     <div className="flex flex-col items-center gap-2 sm:gap-3">
-      <div className="text-sm sm:text-base font-semibold text-[#800000] text-center mb-1 sm:mb-2">{title}</div>
+      <div className="text-sm sm:text-base font-semibold text-[#800000] text-center mb-1 sm:mb-2">
+        {title}
+      </div>
       {subtitle && (
-        <div className="text-[10px] sm:text-xs text-[#666666] text-center mb-1">{subtitle}</div>
+        <div className="text-[10px] sm:text-xs text-[#666666] text-center mb-1">
+          {subtitle}
+        </div>
       )}
-      <div 
+      <div
         ref={teamPairRef}
-        className={`flex ${isHorizontal ? 'flex-row items-center gap-2 sm:gap-3' : 'flex-col gap-2 sm:gap-2'}`}
+        className={`flex ${
+          isHorizontal
+            ? "flex-row items-center gap-2 sm:gap-3"
+            : "flex-col gap-2 sm:gap-2"
+        }`}
       >
         <TeamBox team={teams[0]} isFinal={isFinal} />
         <div className="flex items-center justify-center h-4 sm:h-6 text-xs sm:text-sm font-bold text-[#800000]">
@@ -177,13 +199,25 @@ const MatchPair = ({
   );
 };
 
-const TeamBox = ({ team, isFinal = false }: { team: string; isFinal?: boolean }) => (
-  <div className={`bg-white border border-[#E6E6E6] rounded-lg shadow-sm text-center ${
-    isFinal 
-      ? 'w-24 sm:w-28 md:w-32 h-16 sm:h-20 md:h-24 px-2 py-2 sm:py-3 md:py-4 flex items-center justify-center' 
-      : 'w-28 sm:w-32 md:w-40 px-2 sm:px-3 md:px-4 py-2 sm:py-2 md:py-3'
-  } font-medium text-[#2C2C2C] hover:bg-[#f9f6f5] transition-colors`}>
-    <div className={isFinal ? 'text-[10px] sm:text-xs leading-tight' : 'text-xs sm:text-sm'}>
+const TeamBox = ({
+  team,
+  isFinal = false,
+}: {
+  team: string;
+  isFinal?: boolean;
+}) => (
+  <div
+    className={`bg-white border border-[#E6E6E6] rounded-lg shadow-sm text-center ${
+      isFinal
+        ? "w-24 sm:w-28 md:w-32 h-16 sm:h-20 md:h-24 px-2 py-2 sm:py-3 md:py-4 flex items-center justify-center"
+        : "w-28 sm:w-32 md:w-40 px-2 sm:px-3 md:px-4 py-2 sm:py-2 md:py-3"
+    } font-medium text-[#2C2C2C] hover:bg-[#f9f6f5] transition-colors`}
+  >
+    <div
+      className={
+        isFinal ? "text-[10px] sm:text-xs leading-tight" : "text-xs sm:text-sm"
+      }
+    >
       {team}
     </div>
   </div>

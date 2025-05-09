@@ -57,6 +57,8 @@ export interface TeamProps {
     ll2: string;
     rr1: string;
     rr2: string;
+    fl: string;
+    fr: string;
     winner: string;
   }
   
