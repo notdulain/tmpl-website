@@ -365,7 +365,7 @@ export default function LiveScores() {
                                 <div className="text-lg md:text-2xl font-medium">
                                   {parseFloat(
                                     `${Math.floor(inning.overs / 4)}.${
-                                      (inning.overs % 4)
+                                      inning.overs % 4
                                     }`
                                   )}
                                   /4.0
@@ -568,17 +568,17 @@ export default function LiveScores() {
             </TabsList>
             <TabsContent value="pending" className="space-y-3">
               {matches &&
-                Object.values(matches)
-                  .filter(match => match.status != "live" && !match.innings?.[2]?.completed)
-                  .sort((a, b) => {
-                    // Sort by match number (assuming match IDs are in format "match1", "match2", etc.)
-                    const numA = parseInt(a.team1.replace(/\D/g, '')) || 0;
-                    const numB = parseInt(b.team1.replace(/\D/g, '')) || 0;
-                    return numA - numB;
-                  })
-                  .map((match, index) => (
+                Object.entries(matches)
+                  .filter(
+                    ([, match]) =>
+                      match.status != "live" && !match.innings?.[2]?.completed
+                  )
+                  .sort(
+                    ([keyA], [keyB]) => parseInt(keyA, 10) - parseInt(keyB, 10)
+                  )
+                  .map(([key, match], index) => (
                     <Card
-                      key={index}
+                      key={key}
                       className="bg-white border-[#E5E5E5] shadow-sm"
                     >
                       <CardContent className="p-4">
@@ -624,9 +624,9 @@ export default function LiveScores() {
                               </div>
                               <div className="text-sm text-[#666666]">
                                 {match.innings && match.innings[1]
-                                  ? `${Math.floor(match.innings[1].overs / 4)}.${
-                                      match.innings[1].overs % 4
-                                    }`
+                                  ? `${Math.floor(
+                                      match.innings[1].overs / 4
+                                    )}.${match.innings[1].overs % 4}`
                                   : "0.0"}{" "}
                                 overs
                               </div>
@@ -646,9 +646,9 @@ export default function LiveScores() {
                               </div>
                               <div className="text-sm text-[#666666]">
                                 {match.innings && match.innings[2]
-                                  ? `${Math.floor(match.innings[2].overs / 4)}.${
-                                      match.innings[2].overs % 4
-                                    }`
+                                  ? `${Math.floor(
+                                      match.innings[2].overs / 4
+                                    )}.${match.innings[2].overs % 4}`
                                   : "0.0"}{" "}
                                 overs
                               </div>
@@ -672,7 +672,10 @@ export default function LiveScores() {
             <TabsContent value="completed" className="space-y-3">
               {matches &&
                 Object.values(matches)
-                  .filter(match => match.status != "live" && match.innings?.[2]?.completed)
+                  .filter(
+                    (match) =>
+                      match.status != "live" && match.innings?.[2]?.completed
+                  )
                   .sort((a, b) => {
                     // Get the completion time from the second innings
                     const timeA = a.innings?.[2]?.completedAt || 0;
@@ -688,11 +691,15 @@ export default function LiveScores() {
                       <CardContent className="p-4">
                         <div className="flex justify-between items-center mb-2">
                           <div className="text-sm text-[#666666]">
-                            {match.innings?.[2]?.completedAt ? new Date(match.innings[2].completedAt).toLocaleTimeString('en-US', {
-                              hour: '2-digit',
-                              minute: '2-digit',
-                              hour12: true
-                            }) : 'time'}
+                            {match.innings?.[2]?.completedAt
+                              ? new Date(
+                                  match.innings[2].completedAt
+                                ).toLocaleTimeString("en-US", {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                  hour12: true,
+                                })
+                              : "time"}
                           </div>
                           <Badge
                             variant="outline"
@@ -709,9 +716,9 @@ export default function LiveScores() {
                               </div>
                               <div className="text-sm text-[#666666]">
                                 {match.innings && match.innings[1]
-                                  ? `${Math.floor(match.innings[1].overs / 4)}.${
-                                      match.innings[1].overs % 4
-                                    }`
+                                  ? `${Math.floor(
+                                      match.innings[1].overs / 4
+                                    )}.${match.innings[1].overs % 4}`
                                   : "0.0"}{" "}
                                 overs
                               </div>
@@ -731,9 +738,9 @@ export default function LiveScores() {
                               </div>
                               <div className="text-sm text-[#666666]">
                                 {match.innings && match.innings[2]
-                                  ? `${Math.floor(match.innings[2].overs / 4)}.${
-                                      match.innings[2].overs % 4
-                                    }`
+                                  ? `${Math.floor(
+                                      match.innings[2].overs / 4
+                                    )}.${match.innings[2].overs % 4}`
                                   : "0.0"}{" "}
                                 overs
                               </div>
