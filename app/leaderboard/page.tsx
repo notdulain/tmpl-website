@@ -411,13 +411,15 @@ export default function LeaderboardPage() {
           </div>
         </div>
 
+        <Bracket />
+
         {/* Legend */}
         <div className="bg-white rounded-xl shadow-md p-6 border border-[#E6E6E6]">
           <div className="flex items-center gap-2 mb-4">
             <Info className="h-5 w-5 text-[#800000]" />
             <h3 className="text-lg font-semibold text-[#2C2C2C]">Legend</h3>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="flex items-center gap-2">
               <span className="font-semibold text-[#800000]">P:</span>
               <span className="text-[#444444]">Matches Played</span>
@@ -430,9 +432,13 @@ export default function LeaderboardPage() {
               <span className="font-semibold text-[#800000]">L:</span>
               <span className="text-[#444444]">Losses</span>
             </div>
+            <div className="flex items-center gap-2">
+              <span className="font-semibold text-[#800000]">NRR:</span>
+              <span className="text-[#444444]">Net Run Rate</span>
+            </div>
           </div>
         </div>
-        <Bracket />
+        
       </div>
     </div>
   );
