@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { app } from "@/lib/firebase";
 import { get, getDatabase, onValue, ref, set } from "firebase/database";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import dynamic from 'next/dynamic';
 
 import { InningDataProps } from "../types/interfaces";
 
@@ -37,6 +38,35 @@ interface TeamProps {
   member8: string;
 }
 
+// Dynamically import react-confetti to avoid SSR issues
+const ReactConfetti = dynamic(() => import('react-confetti'), {
+  ssr: false
+});
+
+// Custom hook for window dimensions
+const useWindowSize = () => {
+  const [windowSize, setWindowSize] = useState({
+    width: typeof window !== 'undefined' ? window.innerWidth : 0,
+    height: typeof window !== 'undefined' ? window.innerHeight : 0,
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    window.addEventListener('resize', handleResize);
+    handleResize(); // Call once to set initial size
+
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  return windowSize;
+};
+
 const styles = `
   @keyframes pulse-slow {
     0% {
@@ -60,6 +90,9 @@ export default function LiveScores() {
   const [matches, setMatches] = useState<MatchProp[]>();
   const [teamNames, setTeamNames] = useState<Record<string, string>>({});
   const [teamData, setTeamData] = useState<Record<string, TeamProps>>({});
+  const [showWinner, setShowWinner] = useState(false);
+  const [winner, setWinner] = useState("");
+  const { width, height } = useWindowSize();
 
   useEffect(() => {
     const dataRef = ref(database, "matches/");
@@ -177,8 +210,48 @@ export default function LiveScores() {
       }
     }
   };
+
+  // Add new useEffect for winner
+  useEffect(() => {
+    const db = getDatabase();
+    const finalsRef = ref(db, "finals");
+
+    onValue(finalsRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data && data.winner && data.winner !== "") {
+        setWinner(data.winner);
+        setShowWinner(true);
+      } else {
+        setShowWinner(false);
+      }
+    });
+  }, []);
+
   return (
     <div className="min-h-screen bg-[#FAF8F5] text-[#1A1A1A]">
+      {/* Confetti Container */}
+      {showWinner && winner && (
+        <div className="fixed inset-0 pointer-events-none z-50">
+          <ReactConfetti
+            width={width}
+            height={height}
+            recycle={true}
+            numberOfPieces={width < 768 ? 100 : 200}
+            gravity={0.2}
+            initialVelocityY={5}
+            tweenDuration={10000}
+            confettiSource={{
+              x: 0,
+              y: 0,
+              w: width,
+              h: 0
+            }}
+            colors={['#800000', '#FFD700', '#FFFFFF', '#FF6B6B', '#4ECDC4']}
+            style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%' }}
+          />
+        </div>
+      )}
+
       {/* Header */}
       <header className="bg-white border-b border-[#E5E5E5] sticky top-0 z-50">
         <div className="px-4 md:px-8 py-3 flex items-center justify-between max-w-7xl mx-auto">
