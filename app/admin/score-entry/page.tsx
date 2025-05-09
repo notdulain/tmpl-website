@@ -591,12 +591,19 @@ export default function ScoreEntry() {
               <div className="text-right">
                 <div className="text-sm text-[#666666]">Current Score</div>
                 <div className="text-xl font-bold text-[#800000]">
-                  {inningData.runs}/{inningData.wickets} (
-                  {parseFloat(
-                    `${Math.floor(inningData.overs / 4)}.${
-                      inningData.overs % 4
-                    }`
-                  )}
+                  {inningData.runs}/{inningData.wickets} ({parseFloat(
+                      `${Math.floor(inningData.overs / 4)}.${
+                        (inningData.overs % 4)
+                      }`
+                    )}
+                  {/* <div className="text-lg md:text-2xl font-medium">
+                    {parseFloat(
+                      `${Math.floor(inningData.overs / 4)}.${
+                        inningData.overs % 4
+                      }`
+                    )}
+                    /4.0
+                  </div> */}
                   )
                 </div>
               </div>

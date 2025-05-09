@@ -300,7 +300,7 @@ export default function LiveScores() {
                                 <div className="text-lg md:text-2xl font-medium">
                                   {parseFloat(
                                     `${Math.floor(inning.overs / 4)}.${
-                                      inning.overs % 4
+                                      (inning.overs % 4)
                                     }`
                                   )}
                                   /4.0
@@ -548,10 +548,10 @@ export default function LiveScores() {
                             </div>
                             <div className="text-sm text-[#666666]">
                               {match.innings && match.innings[1]
-                                ? `${Math.floor(match.innings[1].overs / 4)}.${
-                                    match.innings[1].overs % 4
+                                ? `${Math.floor(match.innings[1].overs / 4) + 1}.${
+                                    (match.innings[1].overs % 4) + 1
                                   }`
-                                : "0.0"}{" "}
+                                : "1.1"}{" "}
                               overs
                             </div>
                           </div>
@@ -570,10 +570,10 @@ export default function LiveScores() {
                             </div>
                             <div className="text-sm text-[#666666]">
                               {match.innings && match.innings[2]
-                                ? `${Math.floor(match.innings[2].overs / 4)}.${
-                                    match.innings[2].overs % 4
+                                ? `${Math.floor(match.innings[2].overs / 4) + 1}.${
+                                    (match.innings[2].overs % 4) + 1
                                   }`
-                                : "0.0"}{" "}
+                                : "1.1"}{" "}
                               overs
                             </div>
                           </div>
