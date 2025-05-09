@@ -3,7 +3,7 @@
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { Trophy, Users, Calendar, ExternalLink, Menu, X } from "lucide-react"
+import { Trophy, Users, Calendar, ExternalLink, Menu, X, Github, Linkedin, Instagram } from "lucide-react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 
@@ -266,6 +266,23 @@ export default function Home() {
                 Club VPPR - Central Link Toastmasters<br />
                 PR Manager - Division J
               </p>
+              <div className="flex gap-4 mt-4">
+                <a href="https://github.com/notdulain" target="_blank" rel="noopener noreferrer" className="text-charcoal-300 hover:text-maroon-500 transition-colors">
+                  <div className="w-8 h-8 rounded-full border border-charcoal-300 hover:border-maroon-500 flex items-center justify-center">
+                    <Github className="h-4 w-4" />
+                  </div>
+                </a>
+                <a href="https://https://www.linkedin.com/in/dulain-nethwin-gunawardhana-41b251294/" target="_blank" rel="noopener noreferrer" className="text-charcoal-300 hover:text-maroon-500 transition-colors">
+                  <div className="w-8 h-8 rounded-full border border-charcoal-300 hover:border-maroon-500 flex items-center justify-center">
+                    <Linkedin className="h-4 w-4" />
+                  </div>
+                </a>
+                <a href="https://instagram.com/notdulain/" target="_blank" rel="noopener noreferrer" className="text-charcoal-300 hover:text-maroon-500 transition-colors">
+                  <div className="w-8 h-8 rounded-full border border-charcoal-300 hover:border-maroon-500 flex items-center justify-center">
+                    <Instagram className="h-4 w-4" />
+                  </div>
+                </a>
+              </div>
             </div>
             <div className="bg-white rounded-2xl p-6 flex flex-col items-center shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.16)] transition-shadow">
               <div className="w-24 h-24 rounded-full overflow-hidden mb-4 ring-2 ring-maroon-500/20">
@@ -283,6 +300,23 @@ export default function Home() {
                 Full Stack Developer<br />
                 Specializing in Firebase & Next.js
               </p>
+              <div className="flex gap-4 mt-4">
+                <a href="https://github.com/sathindudezoysa" target="_blank" rel="noopener noreferrer" className="text-charcoal-300 hover:text-maroon-500 transition-colors">
+                  <div className="w-8 h-8 rounded-full border border-charcoal-300 hover:border-maroon-500 flex items-center justify-center">
+                    <Github className="h-4 w-4" />
+                  </div>
+                </a>
+                <a href="https://www.linkedin.com/in/sathindu-dhanushka-de-zoysa-686b43267/" target="_blank" rel="noopener noreferrer" className="text-charcoal-300 hover:text-maroon-500 transition-colors">
+                  <div className="w-8 h-8 rounded-full border border-charcoal-300 hover:border-maroon-500 flex items-center justify-center">
+                    <Linkedin className="h-4 w-4" />
+                  </div>
+                </a>
+                <a href="https://www.instagram.com/sathindu_dhanushka/" target="_blank" rel="noopener noreferrer" className="text-charcoal-300 hover:text-maroon-500 transition-colors">
+                  <div className="w-8 h-8 rounded-full border border-charcoal-300 hover:border-maroon-500 flex items-center justify-center">
+                    <Instagram className="h-4 w-4" />
+                  </div>
+                </a>
+              </div>
             </div>
           </div>
         </div>
