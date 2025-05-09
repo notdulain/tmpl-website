@@ -1,0 +1,113 @@
+"use client";
+import { useState } from "react";
+
+import { FinalsProp } from "@/app/types/interfaces";
+import { getDatabase, ref, get, set } from "firebase/database";
+import { useEffect } from "react";
+import { app } from "@/lib/firebase";
+export default function FinalPage() {
+  const [finalsData, setFinalData] = useState<FinalsProp>({
+    l1: "",
+    l2: "",
+    l3: "",
+    l4: "",
+    r1: "",
+    r2: "",
+    r3: "",
+    r4: "",
+    ll1: "",
+    ll2: "",
+    rr1: "",
+    rr2: "",
+    winner: "",
+  });
+  const [teams, setTeams] = useState<string[] | null>(null);
+  const db = getDatabase(app);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const finalsRef = ref(db, "finals");
+      try {
+        const snapshot = await get(finalsRef);
+        if (snapshot.exists()) {
+          setFinalData(snapshot.val());
+        } else {
+          console.log("No data available");
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const dbRef = ref(db, "teams/");
+        const snapshot = await get(dbRef);
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          const keys = Object.keys(data);
+          console.log("Fetched teams:", keys); // Debug log
+          setTeams(keys);
+        } else {
+          console.log("No teams found in database");
+        }
+      } catch (error) {
+        console.error("Error fetching teams:", error);
+      }
+    };
+    fetchData();
+  }, [db]);
+
+  useEffect(() => {
+    const saveFinalsData = async () => {
+      const refference = ref(db, "finals");
+      set(refference, finalsData);
+    };
+
+    saveFinalsData();
+  }, [finalsData]);
+
+  return (
+    <div className="m-10">
+      <h1>Set Finals Teams</h1>
+      {teams ? (
+        <div className="w-full p-10">
+          {Object.keys(finalsData).map((key) => (
+            <div key={key} className="w-[50%] flex flex-col space-y-2">
+              <label
+                htmlFor={key}
+                className="text-sm font-medium text-gray-700"
+              >
+                {key.toUpperCase()}:
+              </label>
+              <select
+                id={key}
+                value={(finalsData as any)[key]}
+                onChange={(e) =>
+                  setFinalData((prev) => ({
+                    ...prev,
+                    [key]: e.target.value,
+                  }))
+                }
+                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              >
+                <option value="">Select a team</option>
+                {teams.map((team) => (
+                  <option key={team} value={team}>
+                    {team}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p>Loading teams...</p>
+      )}
+    </div>
+  );
+}

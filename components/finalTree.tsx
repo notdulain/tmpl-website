@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
+import { FinalsProp } from "@/app/types/interfaces";
+import { getDatabase, ref, onValue } from "firebase/database";
 const rounds = [
   ["Team A", "Team B"],
   ["Team C", "Team D"],
@@ -8,6 +10,34 @@ const rounds = [
 ];
 
 export const Bracket = () => {
+  const [finals, setFinals] = useState<FinalsProp>({
+    l1: "",
+    l2: "",
+    l3: "",
+    l4: "",
+    r1: "",
+    r2: "",
+    r3: "",
+    r4: "",
+    ll1: "",
+    ll2: "",
+    rr1: "",
+    rr2: "",
+    winner: "",
+  });
+
+  useEffect(() => {
+    const db = getDatabase();
+    const finalsRef = ref(db, "finals");
+
+    onValue(finalsRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        setFinals(data);
+      }
+    });
+  }, []);
+
   return (
     <div className="flex justify-center items-center w-full min-h-screen p-4 bg-gray-100">
       <div className="grid grid-cols-7 gap-4">

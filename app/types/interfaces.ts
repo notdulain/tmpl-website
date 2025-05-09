@@ -43,4 +43,20 @@ export interface TeamProps {
     completedAt?: number;
     recentDeliveries: string[];
   }
+
+  export interface FinalsProp {
+    l1: string;
+    l2: string;
+    l3: string;
+    l4: string;
+    r1: string;
+    r2: string;
+    r3: string;
+    r4: string;
+    ll1: string;
+    ll2: string;
+    rr1: string;
+    rr2: string;
+    winner: string;
+  }
   
