@@ -596,14 +596,6 @@ export default function ScoreEntry() {
                         (inningData.overs % 4)
                       }`
                     )}
-                  {/* <div className="text-lg md:text-2xl font-medium">
-                    {parseFloat(
-                      `${Math.floor(inningData.overs / 4)}.${
-                        inningData.overs % 4
-                      }`
-                    )}
-                    /4.0
-                  </div> */}
                   )
                 </div>
               </div>

@@ -9,6 +9,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { app } from "@/lib/firebase";
 import { get, getDatabase, onValue, ref, set } from "firebase/database";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface InningDataProps {
   battingTeam: string;
@@ -496,109 +497,184 @@ export default function LiveScores() {
           <h2 className="text-lg md:text-xl font-medium text-[#666666] mb-4">
             Matches
           </h2>
-          <div className="space-y-3">
-            {matches &&
-              Object.values(matches).map((match, index) =>
-                match.status != "live" ? (
-                  <Card
-                    key={index}
-                    className="bg-white border-[#E5E5E5] shadow-sm"
-                  >
-                    <CardContent className="p-4">
-                      {match.innings &&
-                        (() => {
-                          const inning1: InningDataProps = match?.innings[1];
-                          const inning2: InningDataProps = match?.innings[2];
+          <Tabs defaultValue="pending" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-4">
+              <TabsTrigger value="pending">Pending</TabsTrigger>
+              <TabsTrigger value="completed">Completed</TabsTrigger>
+            </TabsList>
+            <TabsContent value="pending" className="space-y-3">
+              {matches &&
+                Object.values(matches).map((match, index) =>
+                  match.status != "live" && !match.innings?.[2]?.completed ? (
+                    <Card
+                      key={index}
+                      className="bg-white border-[#E5E5E5] shadow-sm"
+                    >
+                      <CardContent className="p-4">
+                        {match.innings &&
+                          (() => {
+                            const inning1: InningDataProps = match?.innings[1];
+                            const inning2: InningDataProps = match?.innings[2];
 
-                          if (inning1.completed && inning2.completed) {
-                            return (
-                              <div className="flex justify-between items-center mb-2">
-                                <div className="text-sm text-[#666666]">
-                                  date
+                            if (inning1.completed && inning2.completed) {
+                              return (
+                                <div className="flex justify-between items-center mb-2">
+                                  <div className="text-sm text-[#666666]">
+                                    date
+                                  </div>
+                                  <Badge
+                                    variant="outline"
+                                    className="text-xs border-[#800000] text-[#800000]"
+                                  >
+                                    Completed
+                                  </Badge>
                                 </div>
-                                <Badge
-                                  variant="outline"
-                                  className="text-xs border-[#800000] text-[#800000]"
-                                >
-                                  Completed
-                                </Badge>
-                              </div>
-                            );
-                          } else {
-                            return (
-                              <div className="flex justify-between items-center mb-2">
-                                <div className="text-sm text-[#666666]">
-                                  date
+                              );
+                            } else {
+                              return (
+                                <div className="flex justify-between items-center mb-2">
+                                  <div className="text-sm text-[#666666]">
+                                    date
+                                  </div>
+                                  <Badge
+                                    variant="outline"
+                                    className="text-xs border-[#800000] text-[#800000]"
+                                  >
+                                    Pending
+                                  </Badge>
                                 </div>
-                                <Badge
-                                  variant="outline"
-                                  className="text-xs border-[#800000] text-[#800000]"
-                                >
-                                  Pending
-                                </Badge>
+                              );
+                            }
+                          })()}
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center">
+                            <div className="flex-1">
+                              <div className="font-medium">
+                                {teamNames[match.team1] || match.team1}
                               </div>
-                            );
-                          }
-                        })()}
-                      <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                          <div className="flex-1">
-                            <div className="font-medium">
-                              {teamNames[match.team1] || match.team1}
+                              <div className="text-sm text-[#666666]">
+                                {match.innings && match.innings[1]
+                                  ? `${Math.floor(match.innings[1].overs / 4)}.${
+                                      match.innings[1].overs % 4
+                                    }`
+                                  : "0.0"}{" "}
+                                overs
+                              </div>
                             </div>
-                            <div className="text-sm text-[#666666]">
-                              {match.innings && match.innings[1]
-                                ? `${Math.floor(match.innings[1].overs / 4) + 1}.${
-                                    (match.innings[1].overs % 4) + 1
-                                  }`
-                                : "1.1"}{" "}
-                              overs
+                            <div className="text-right">
+                              <div className="font-bold text-[#800000]">
+                                {match.innings && match.innings[1]
+                                  ? `${match.innings[1].runs}/${match.innings[1].wickets}`
+                                  : "0/0"}
+                              </div>
                             </div>
                           </div>
-                          <div className="text-right">
-                            <div className="font-bold text-[#800000]">
-                              {match.innings && match.innings[1]
-                                ? `${match.innings[1].runs}/${match.innings[1].wickets}`
-                                : "0/0"}
+                          <div className="flex justify-between items-center">
+                            <div className="flex-1">
+                              <div className="font-medium">
+                                {teamNames[match.team2] || match.team2}
+                              </div>
+                              <div className="text-sm text-[#666666]">
+                                {match.innings && match.innings[2]
+                                  ? `${Math.floor(match.innings[2].overs / 4)}.${
+                                      match.innings[2].overs % 4
+                                    }`
+                                  : "0.0"}{" "}
+                                overs
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className="font-bold text-[#800000]">
+                                {match.innings && match.innings[2]
+                                  ? `${match.innings[2].runs}/${match.innings[2].wickets}`
+                                  : "0/0"}
+                              </div>
                             </div>
                           </div>
                         </div>
-                        <div className="flex justify-between items-center">
-                          <div className="flex-1">
-                            <div className="font-medium">
-                              {teamNames[match.team2] || match.team2}
+                        <div className="mt-2 font-medium self-center">
+                          {showWinningTeam(match)}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ) : null
+                )}
+            </TabsContent>
+            <TabsContent value="completed" className="space-y-3">
+              {matches &&
+                Object.values(matches).map((match, index) =>
+                  match.status != "live" && match.innings?.[2]?.completed ? (
+                    <Card
+                      key={index}
+                      className="bg-white border-[#E5E5E5] shadow-sm"
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex justify-between items-center mb-2">
+                          <div className="text-sm text-[#666666]">
+                            date
+                          </div>
+                          <Badge
+                            variant="outline"
+                            className="text-xs border-[#800000] text-[#800000]"
+                          >
+                            Completed
+                          </Badge>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center">
+                            <div className="flex-1">
+                              <div className="font-medium">
+                                {teamNames[match.team1] || match.team1}
+                              </div>
+                              <div className="text-sm text-[#666666]">
+                                {match.innings && match.innings[1]
+                                  ? `${Math.floor(match.innings[1].overs / 4)}.${
+                                      match.innings[1].overs % 4
+                                    }`
+                                  : "0.0"}{" "}
+                                overs
+                              </div>
                             </div>
-                            <div className="text-sm text-[#666666]">
-                              {match.innings && match.innings[2]
-                                ? `${Math.floor(match.innings[2].overs / 4) + 1}.${
-                                    (match.innings[2].overs % 4) + 1
-                                  }`
-                                : "1.1"}{" "}
-                              overs
+                            <div className="text-right">
+                              <div className="font-bold text-[#800000]">
+                                {match.innings && match.innings[1]
+                                  ? `${match.innings[1].runs}/${match.innings[1].wickets}`
+                                  : "0/0"}
+                              </div>
                             </div>
                           </div>
-                          <div className="text-right">
-                            <div className="font-bold text-[#800000]">
-                              {match.innings && match.innings[2]
-                                ? `${match.innings[2].runs}/${match.innings[2].wickets}`
-                                : "0/0"}
+                          <div className="flex justify-between items-center">
+                            <div className="flex-1">
+                              <div className="font-medium">
+                                {teamNames[match.team2] || match.team2}
+                              </div>
+                              <div className="text-sm text-[#666666]">
+                                {match.innings && match.innings[2]
+                                  ? `${Math.floor(match.innings[2].overs / 4)}.${
+                                      match.innings[2].overs % 4
+                                    }`
+                                  : "0.0"}{" "}
+                                overs
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className="font-bold text-[#800000]">
+                                {match.innings && match.innings[2]
+                                  ? `${match.innings[2].runs}/${match.innings[2].wickets}`
+                                  : "0/0"}
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                      <div className="mt-2 font-medium self-center">
-                        {showWinningTeam(match)}
-                      </div>
-                      {/* <div className="mt-2 text-sm font-medium text-[#800000]">
-                        {match.status}
-                      </div> */}
-                    </CardContent>
-                  </Card>
-                ) : (
-                  ""
-                )
-              )}
-          </div>
+                        <div className="mt-2 font-medium self-center">
+                          {showWinningTeam(match)}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ) : null
+                )}
+            </TabsContent>
+          </Tabs>
         </div>
       </main>
     </div>
