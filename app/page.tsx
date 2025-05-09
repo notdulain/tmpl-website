@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation"
 export default function CountdownPage() {
   const router = useRouter()
   const [timeLeft, setTimeLeft] = useState({
-    days: 0,
     hours: 0,
     minutes: 0,
     seconds: 0
@@ -29,14 +28,12 @@ export default function CountdownPage() {
       const difference = targetDate.getTime() - now.getTime()
       
       const newTimeLeft = {
-        days: Math.floor(difference / (1000 * 60 * 60 * 24)),
         hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
         minutes: Math.floor((difference / 1000 / 60) % 60),
         seconds: Math.floor((difference / 1000) % 60)
       }
 
       if (
-        newTimeLeft.days !== timeLeft.days ||
         newTimeLeft.hours !== timeLeft.hours ||
         newTimeLeft.minutes !== timeLeft.minutes ||
         newTimeLeft.seconds !== timeLeft.seconds
@@ -77,14 +74,7 @@ export default function CountdownPage() {
           className="mb-8 md:mb-16 w-[360px] md:w-[450px] h-auto"
         />
 
-        <div className="grid grid-cols-4 gap-4 md:gap-8 lg:gap-16">
-          <div className="flex flex-col items-center">
-            <span className="countdown text-4xl sm:text-5xl md:text-7xl lg:text-8xl mb-2 md:mb-4">
-              {timeLeft.days}
-            </span>
-            <span className="text-sm sm:text-base md:text-xl lg:text-2xl text-white">Days</span>
-          </div>
-
+        <div className="flex gap-8 md:gap-16 lg:gap-24">
           <div className="flex flex-col items-center">
             <span className="countdown text-4xl sm:text-5xl md:text-7xl lg:text-8xl mb-2 md:mb-4">
               {timeLeft.hours}
