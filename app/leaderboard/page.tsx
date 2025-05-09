@@ -1,26 +1,14 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Trophy, Info } from "lucide-react";
+import { Trophy, Info, ArrowLeft } from "lucide-react";
 import { get, getDatabase, ref, onValue } from "firebase/database";
 import { app } from "@/lib/firebase";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 import { TeamProps, InningDataProps } from "../types/interfaces";
-// Mock data for the leaderboard
-const mockData = {
-  groupA: [
-    { name: "Central Link", played: 3, wins: 3, losses: 0, points: 6 },
-    { name: "Colombo", played: 3, wins: 2, losses: 1, points: 4 },
-    { name: "Kandy", played: 3, wins: 1, losses: 2, points: 2 },
-    { name: "Galle", played: 3, wins: 0, losses: 3, points: 0 },
-  ],
-  groupB: [
-    { name: "Jaffna", played: 3, wins: 3, losses: 0, points: 6 },
-    { name: "Trinco", played: 3, wins: 2, losses: 1, points: 4 },
-    { name: "Batticaloa", played: 3, wins: 1, losses: 2, points: 2 },
-    { name: "Ampara", played: 3, wins: 0, losses: 3, points: 0 },
-  ],
-};
+
 interface MatchProp {
   team1: string;
   team2: string;
@@ -45,6 +33,11 @@ export default function LeaderboardPage() {
       wins: number;
       losses: number;
       pts: number;
+      totalRunsScored: number;
+      totalOversFaced: number;
+      totalRunsConceded: number;
+      totalOversBowled: number;
+      nrr: number;
     }
   >>({});
   useEffect(() => {
@@ -123,10 +116,16 @@ export default function LeaderboardPage() {
       wins: number;
       losses: number;
       pts: number;
+      totalRunsScored: number;
+      totalOversFaced: number;
+      totalRunsConceded: number;
+      totalOversBowled: number;
+      nrr: number;
     }> = {};
 
     Object.values(matches).forEach((match) => {
       const { team1, team2, innings } = match;
+      
       // Initialize stats for both teams if not already present
       if (!newStats[team1])
         newStats[team1] = {
@@ -136,6 +135,11 @@ export default function LeaderboardPage() {
           wins: 0,
           losses: 0,
           pts: 0,
+          totalRunsScored: 0,
+          totalOversFaced: 0,
+          totalRunsConceded: 0,
+          totalOversBowled: 0,
+          nrr: 0
         };
       if (!newStats[team2])
         newStats[team2] = {
@@ -145,6 +149,11 @@ export default function LeaderboardPage() {
           wins: 0,
           losses: 0,
           pts: 0,
+          totalRunsScored: 0,
+          totalOversFaced: 0,
+          totalRunsConceded: 0,
+          totalOversBowled: 0,
+          nrr: 0
         };
 
       // Check if the team has scored in the innings before incrementing played count
@@ -154,12 +163,24 @@ export default function LeaderboardPage() {
           inning.completed
         ) {
           newStats[team1].played += 1;
+          // Add runs and overs for team1 when batting
+          newStats[team1].totalRunsScored += inning.runs;
+          newStats[team1].totalOversFaced += inning.overs;
+          // Add runs and overs for team2 when bowling
+          newStats[team2].totalRunsConceded += inning.runs;
+          newStats[team2].totalOversBowled += inning.overs;
         }
         if (
           getTeamName2(match, inning?.battingTeam) === team2 &&
           inning.completed
         ) {
           newStats[team2].played += 1;
+          // Add runs and overs for team2 when batting
+          newStats[team2].totalRunsScored += inning.runs;
+          newStats[team2].totalOversFaced += inning.overs;
+          // Add runs and overs for team1 when bowling
+          newStats[team1].totalRunsConceded += inning.runs;
+          newStats[team1].totalOversBowled += inning.overs;
         }
       });
 
@@ -189,13 +210,21 @@ export default function LeaderboardPage() {
       }
     });
 
+    // Calculate NRR for each team
+    Object.keys(newStats).forEach((team) => {
+      const stats = newStats[team];
+      // Calculate NRR using the formula: (runs scored/overs faced) - (runs conceded/overs bowled)
+      const runRateScored = stats.totalOversFaced > 0 ? stats.totalRunsScored / (stats.totalOversFaced / 4) : 0;
+      const runRateConceded = stats.totalOversBowled > 0 ? stats.totalRunsConceded / (stats.totalOversBowled / 4) : 0;
+      stats.nrr = Number((runRateScored - runRateConceded).toFixed(3));
+    });
+
     // Assign points based on wins
     Object.keys(newStats).forEach((team) => {
       newStats[team].pts = newStats[team].wins * 2;
     });
 
     console.log(newStats)
-
     setStats(newStats);
     return newStats;
   };
@@ -206,11 +235,26 @@ console.log(stats)
   return (
     <div className="min-h-screen bg-[#FAF9F6] text-[#2C2C2C]">
       <div className="container mx-auto px-4 py-12">
-        <div className="flex items-center justify-center gap-3 mb-12">
+        <div className="flex items-center justify-center gap-3 mb-4">
           <Trophy className="h-8 w-8 text-[#800000]" />
           <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
             Leaderboard
           </h1>
+        </div>
+
+        {/* Back Button */}
+        <div className="flex justify-center mb-12">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="gap-2 text-[#800000] text-sm md:text-base"
+            asChild
+          >
+            <Link href="/home">
+              <ArrowLeft className="h-4 w-4 md:h-5 md:w-5" />
+              Back to Home
+            </Link>
+          </Button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
@@ -273,7 +317,7 @@ console.log(stats)
                           {team.pts}
                         </td>
                         <td className="px-6 py-4 text-sm text-center text-[#444444]">
-                          0.000
+                          {team.nrr.toFixed(3)}
                         </td>
                       </tr>
                     ))}
@@ -341,7 +385,7 @@ console.log(stats)
                           {team.pts}
                         </td>
                         <td className="px-6 py-4 text-sm text-center text-[#444444]">
-                          0.000
+                          {team.nrr.toFixed(3)}
                         </td>
                       </tr>
                     ))}
