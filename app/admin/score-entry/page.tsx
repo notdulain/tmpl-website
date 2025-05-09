@@ -327,8 +327,12 @@ export default function ScoreEntry() {
             db,
             `matches/${selectedMatch}/innings/${inning}`
           );
-          update(refference, { completed: true });
+          update(refference, { 
+            completed: true,
+            completedAt: Date.now()  // Add timestamp when completing
+          });
           inningData.completed = true;
+          inningData.completedAt = Date.now();  // Update local state
           setInningComplete(true);
           setInning("");
           setBattingTeam("");

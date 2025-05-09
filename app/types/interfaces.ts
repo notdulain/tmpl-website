@@ -39,6 +39,7 @@ export interface TeamProps {
     byes: number;
     legByes: number;
     completed: boolean;
+    completedAt?: number;
     recentDeliveries: string[];
   }
   

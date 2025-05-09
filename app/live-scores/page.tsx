@@ -29,6 +29,7 @@ interface InningDataProps {
   byes: number;
   legByes: number;
   completed: boolean;
+  completedAt?: number;
   recentDeliveries: string[];
 }
 
@@ -504,13 +505,31 @@ export default function LiveScores() {
             </TabsList>
             <TabsContent value="pending" className="space-y-3">
               {matches &&
-                Object.values(matches).map((match, index) =>
-                  match.status != "live" && !match.innings?.[2]?.completed ? (
+                Object.values(matches)
+                  .filter(match => match.status != "live" && !match.innings?.[2]?.completed)
+                  .sort((a, b) => {
+                    // Sort by match number (assuming match IDs are in format "match1", "match2", etc.)
+                    const numA = parseInt(a.team1.replace(/\D/g, '')) || 0;
+                    const numB = parseInt(b.team1.replace(/\D/g, '')) || 0;
+                    return numA - numB;
+                  })
+                  .map((match, index) => (
                     <Card
                       key={index}
                       className="bg-white border-[#E5E5E5] shadow-sm"
                     >
                       <CardContent className="p-4">
+                        <div className="flex justify-between items-center mb-2">
+                          <div className="text-sm text-[#666666]">
+                            Match {index + 1}
+                          </div>
+                          <Badge
+                            variant="outline"
+                            className="text-xs border-[#800000] text-[#800000]"
+                          >
+                            Pending
+                          </Badge>
+                        </div>
                         {match.innings &&
                           (() => {
                             const inning1: InningDataProps = match?.innings[1];
@@ -531,19 +550,7 @@ export default function LiveScores() {
                                 </div>
                               );
                             } else {
-                              return (
-                                <div className="flex justify-between items-center mb-2">
-                                  <div className="text-sm text-[#666666]">
-                                    date
-                                  </div>
-                                  <Badge
-                                    variant="outline"
-                                    className="text-xs border-[#800000] text-[#800000]"
-                                  >
-                                    Pending
-                                  </Badge>
-                                </div>
-                              );
+                              return null;
                             }
                           })()}
                         <div className="space-y-2">
@@ -597,13 +604,20 @@ export default function LiveScores() {
                         </div>
                       </CardContent>
                     </Card>
-                  ) : null
-                )}
+                  ))}
             </TabsContent>
             <TabsContent value="completed" className="space-y-3">
               {matches &&
-                Object.values(matches).map((match, index) =>
-                  match.status != "live" && match.innings?.[2]?.completed ? (
+                Object.values(matches)
+                  .filter(match => match.status != "live" && match.innings?.[2]?.completed)
+                  .sort((a, b) => {
+                    // Get the completion time from the second innings
+                    const timeA = a.innings?.[2]?.completedAt || 0;
+                    const timeB = b.innings?.[2]?.completedAt || 0;
+                    // Sort in descending order (newest first)
+                    return timeB - timeA;
+                  })
+                  .map((match, index) => (
                     <Card
                       key={index}
                       className="bg-white border-[#E5E5E5] shadow-sm"
@@ -611,7 +625,11 @@ export default function LiveScores() {
                       <CardContent className="p-4">
                         <div className="flex justify-between items-center mb-2">
                           <div className="text-sm text-[#666666]">
-                            date
+                            {match.innings?.[2]?.completedAt ? new Date(match.innings[2].completedAt).toLocaleTimeString('en-US', {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                              hour12: true
+                            }) : 'time'}
                           </div>
                           <Badge
                             variant="outline"
@@ -666,13 +684,12 @@ export default function LiveScores() {
                             </div>
                           </div>
                         </div>
-                        <div className="mt-2 font-medium self-center">
+                        <div className="mt-2 font-medium self-center text-[#004165]">
                           {showWinningTeam(match)}
                         </div>
                       </CardContent>
                     </Card>
-                  ) : null
-                )}
+                  ))}
             </TabsContent>
           </Tabs>
         </div>
