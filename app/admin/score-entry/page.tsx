@@ -405,7 +405,16 @@ export default function ScoreEntry() {
 
     let data = inningData;
     data.runs = inningData.runs + Number(runs);
-    data.overs = data.overs + 1;
+    //data.overs = data.overs + 1;
+
+    //last over eke NB and WD wlt ball ek count wenne na
+    if (data.overs >= 16) {  // Last over (4 overs = 16 balls)
+      if (!isExtra || (isExtra && extraType !== "wide" && extraType !== "no ball")) {
+          data.overs = data.overs + 1;
+      }
+    } else {
+        data.overs = data.overs + 1;
+    }
 
     // Add the ball to recentDeliveries
     let ballResult = runs;
