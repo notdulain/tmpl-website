@@ -369,16 +369,19 @@ export default function LiveScores() {
                                   Overs
                                 </div>
                                 <div className="text-lg md:text-2xl font-medium">
-                                  {parseFloat(
-                                    `${Math.floor(inning.overs / 4)}.${
-                                      inning.overs % 4
-                                    }`
-                                  )}
-                                  /
                                   {match.group == "SEMI FINALS" ||
                                   match.group == "FINALS"
-                                    ? "6.0"
-                                    : "5.0"}
+                                    ? parseFloat(
+                                        `${Math.floor(inning.overs / 6)}.${
+                                          inning.overs % 6
+                                        }`
+                                      )
+                                    : parseFloat(
+                                        `${Math.floor(inning.overs / 4)}.${
+                                          inning.overs % 4
+                                        }`
+                                      )}
+                                  / 5.0
                                 </div>
                               </div>
                             </div>
