@@ -370,7 +370,7 @@ export default function LiveScores() {
                                 </div>
                                 <div className="text-lg md:text-2xl font-medium">
                                   {match.group == "SEMI FINALS" ||
-                                  match.group == "FINALS"
+                                  match.group == "FINAL"
                                     ? parseFloat(
                                         `${Math.floor(inning.overs / 6)}.${
                                           inning.overs % 6
