@@ -186,7 +186,7 @@ export default function LiveScores() {
     const wicketsLost = secondInning.wickets;
     const oversPlayed = secondInning.overs;
 
-    const totalBalls = 4 * 4;
+    const totalBalls = 4 * 5;
 
     const ballsLeft = totalBalls - oversPlayed;
 
