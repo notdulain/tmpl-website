@@ -186,7 +186,7 @@ export default function LiveScores() {
     const wicketsLost = secondInning.wickets;
     const oversPlayed = secondInning.overs;
 
-    const totalBalls = 4 * 4;
+    const totalBalls = 4 * 5;
 
     const ballsLeft = totalBalls - oversPlayed;
 
@@ -203,7 +203,7 @@ export default function LiveScores() {
       }
     } else {
       const runsShort = runsToWin - runsScored;
-      if (firstInning.battingTeam == "team1") {
+      if (firstInning.battingTeam == "team2") {
         return `${teamNames[match.team1]} won by ${runsShort - 1} runs`;
       } else {
         return `${teamNames[match.team2]} won by ${runsShort - 1} runs`;
