@@ -203,7 +203,7 @@ export default function LiveScores() {
       }
     } else {
       const runsShort = runsToWin - runsScored;
-      if (firstInning.battingTeam == "team2") {
+      if (firstInning.battingTeam == "team1") {
         return `${teamNames[match.team1]} won by ${runsShort - 1} runs`;
       } else {
         return `${teamNames[match.team2]} won by ${runsShort - 1} runs`;
@@ -725,7 +725,9 @@ export default function LiveScores() {
                           <div className="flex justify-between items-center">
                             <div className="flex-1">
                               <div className="font-medium">
-                                {teamNames[match.team1] || match.team1}
+                                {match.innings[1].battingTeam == "team1"
+                                  ? teamNames[match.team1] || match.team1
+                                  : teamNames[match.team2] || match.team2}
                               </div>
                               <div className="text-sm text-[#666666]">
                                 {match.innings && match.innings[1]
@@ -747,7 +749,9 @@ export default function LiveScores() {
                           <div className="flex justify-between items-center">
                             <div className="flex-1">
                               <div className="font-medium">
-                                {teamNames[match.team2] || match.team2}
+                                {match.innings[2].battingTeam == "team1"
+                                  ? teamNames[match.team1] || match.team1
+                                  : teamNames[match.team2] || match.team2}
                               </div>
                               <div className="text-sm text-[#666666]">
                                 {match.innings && match.innings[2]
