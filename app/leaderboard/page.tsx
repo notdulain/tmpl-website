@@ -159,7 +159,6 @@ export default function LeaderboardPage() {
           totalOversBowled: 0,
           nrr: 0,
         };
-
       // Check if the team has scored in the innings before incrementing played count
       innings.forEach((inning) => {
         if (
@@ -234,7 +233,6 @@ export default function LeaderboardPage() {
       newStats[team].pts = newStats[team].wins * 2;
     });
 
-    console.log(newStats);
     setStats(newStats);
     return newStats;
   };
@@ -304,7 +302,7 @@ export default function LeaderboardPage() {
                 </thead>
                 <tbody className="divide-y divide-[#E6E6E6]">
                   {Object.values(stats)
-                    .filter((team) => team.group === "group1")
+                    .filter((team) => team.group === "Group1")
                     .sort((a, b) => b.pts - a.pts)
                     .map((team, index) => (
                       <tr
@@ -375,7 +373,7 @@ export default function LeaderboardPage() {
                 </thead>
                 <tbody className="divide-y divide-[#E6E6E6]">
                   {Object.values(stats)
-                    .filter((team) => team.group === "group2")
+                    .filter((team) => team.group === "Group2")
                     .sort((a, b) => b.pts - a.pts)
                     .map((team, index) => (
                       <tr
@@ -438,7 +436,6 @@ export default function LeaderboardPage() {
             </div>
           </div>
         </div>
-        
       </div>
     </div>
   );
