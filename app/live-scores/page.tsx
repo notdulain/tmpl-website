@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 import { app } from "@/lib/firebase";
 import { get, getDatabase, onValue, ref, set } from "firebase/database";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import dynamic from 'next/dynamic';
+import dynamic from "next/dynamic";
 
 import { InningDataProps } from "../types/interfaces";
 
@@ -39,15 +39,15 @@ interface TeamProps {
 }
 
 // Dynamically import react-confetti to avoid SSR issues
-const ReactConfetti = dynamic(() => import('react-confetti'), {
-  ssr: false
+const ReactConfetti = dynamic(() => import("react-confetti"), {
+  ssr: false,
 });
 
 // Custom hook for window dimensions
 const useWindowSize = () => {
   const [windowSize, setWindowSize] = useState({
-    width: typeof window !== 'undefined' ? window.innerWidth : 0,
-    height: typeof window !== 'undefined' ? window.innerHeight : 0,
+    width: typeof window !== "undefined" ? window.innerWidth : 0,
+    height: typeof window !== "undefined" ? window.innerHeight : 0,
   });
 
   useEffect(() => {
@@ -58,10 +58,10 @@ const useWindowSize = () => {
       });
     };
 
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
     handleResize(); // Call once to set initial size
 
-    return () => window.removeEventListener('resize', handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   return windowSize;
@@ -244,10 +244,16 @@ export default function LiveScores() {
               x: 0,
               y: 0,
               w: width,
-              h: 0
+              h: 0,
             }}
-            colors={['#800000', '#FFD700', '#FFFFFF', '#FF6B6B', '#4ECDC4']}
-            style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%' }}
+            colors={["#800000", "#FFD700", "#FFFFFF", "#FF6B6B", "#4ECDC4"]}
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+            }}
           />
         </div>
       )}
@@ -368,7 +374,10 @@ export default function LiveScores() {
                                       inning.overs % 4
                                     }`
                                   )}
-                                  /5.0
+                                  {match.group == "SEMI FINALS" ||
+                                  match.group == "FINALS"
+                                    ? "6.0"
+                                    : "5.0"}
                                 </div>
                               </div>
                             </div>
