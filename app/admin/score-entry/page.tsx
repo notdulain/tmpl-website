@@ -503,7 +503,7 @@ export default function ScoreEntry() {
         updatedData.wickets = Math.max(0, updatedData.wickets - 1);
       } else if (lastBall === "WD") {
         updatedData.wides = Math.max(0, updatedData.wides - 1);
-        updatedData.runs = Math.max(0, updatedData.runs - 1);
+        updatedData.runs = Math.max(0, updatedData.runs - 6);
       } else if (lastBall === "NB") {
         updatedData.noBals = Math.max(0, updatedData.noBals - 1);
         updatedData.runs = Math.max(0, updatedData.runs - 1);
