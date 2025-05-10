@@ -404,16 +404,20 @@ export default function ScoreEntry() {
     }
 
     let data = inningData;
-    data.runs = inningData.runs + Number(runs);
-    //data.overs = data.overs + 1;
+    
+    // Only increment runs if it's not a dot ball (0 runs)
+    if (runs !== "0") {
+      data.runs = inningData.runs + Number(runs);
+    }
 
-    //last over eke NB and WD wlt ball ek count wenne na
+    // Always increment overs for any valid ball (including dot balls)
+    // Last over eke NB and WD wlt ball ek count wenne na
     if (data.overs >= 16) {  // Last over (4 overs = 16 balls)
       if (!isExtra || (isExtra && extraType !== "wide" && extraType !== "no ball")) {
-          data.overs = data.overs + 1;
+        data.overs = data.overs + 1;
       }
     } else {
-        data.overs = data.overs + 1;
+      data.overs = data.overs + 1;
     }
 
     // Add the ball to recentDeliveries
@@ -432,12 +436,19 @@ export default function ScoreEntry() {
       ballResult.toString(),
     ].slice(-20); // Keep last 20 balls
 
+    // Update batsman statistics
     if (striker == inningData.batsman1) {
       data.batsman1Balls = inningData.batsman1Balls + 1;
-      data.batsman1Runs = inningData.batsman1Runs + Number(runs);
+      // Only increment runs if it's not a dot ball
+      if (runs !== "0") {
+        data.batsman1Runs = inningData.batsman1Runs + Number(runs);
+      }
     } else {
       data.batsman2Balls = inningData.batsman2Balls + 1;
-      data.batsman2Runs = inningData.batsman2Runs + Number(runs);
+      // Only increment runs if it's not a dot ball
+      if (runs !== "0") {
+        data.batsman2Runs = inningData.batsman2Runs + Number(runs);
+      }
     }
 
     if (isExtra) {
