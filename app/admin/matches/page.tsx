@@ -115,6 +115,7 @@ export default function Matches() {
       form.reset();
       setSelectedTeam1("");
       setSelectedTeam2("");
+      setSeletectedGroup("");
       alert("Match created successfully!");
     } else {
       alert("Please enter a Match ID");
@@ -183,10 +184,10 @@ export default function Matches() {
                     <SelectItem key="GROUP 2" value="GROUP 2">
                       GROUP 2
                     </SelectItem>
-                    <SelectItem key="GROUP 2" value="GROUP 2">
+                    <SelectItem key="semifinals" value="SEMI FINALS">
                       SEMI FINALS
                     </SelectItem>
-                    <SelectItem key="GROUP 2" value="GROUP 2">
+                    <SelectItem key="final" value="FINAL">
                       FINALS
                     </SelectItem>
                   </SelectContent>

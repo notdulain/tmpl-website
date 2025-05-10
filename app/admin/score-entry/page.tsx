@@ -404,7 +404,7 @@ export default function ScoreEntry() {
     }
 
     let data = inningData;
-    
+
     // Only increment runs if it's not a dot ball (0 runs)
     if (runs !== "0") {
       data.runs = inningData.runs + Number(runs);
@@ -412,8 +412,12 @@ export default function ScoreEntry() {
 
     // Always increment overs for any valid ball (including dot balls)
     // Last over eke NB and WD wlt ball ek count wenne na
-    if (data.overs >= 16) {  // Last over (4 overs = 16 balls)
-      if (!isExtra || (isExtra && extraType !== "wide" && extraType !== "no ball")) {
+    if (data.overs >= 16) {
+      // Last over (4 overs = 16 balls)
+      if (
+        !isExtra ||
+        (isExtra && extraType !== "wide" && extraType !== "no ball")
+      ) {
         data.overs = data.overs + 1;
       }
     } else {

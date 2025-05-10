@@ -374,6 +374,7 @@ export default function LiveScores() {
                                       inning.overs % 4
                                     }`
                                   )}
+                                  /
                                   {match.group == "SEMI FINALS" ||
                                   match.group == "FINALS"
                                     ? "6.0"
