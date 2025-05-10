@@ -186,7 +186,10 @@ export default function LiveScores() {
     const wicketsLost = secondInning.wickets;
     const oversPlayed = secondInning.overs;
 
-    const totalBalls = 4 * 5;
+    // Set total balls based on match type
+    const totalBalls = match.group === "SEMI FINALS" || match.group === "FINAL" 
+      ? 6 * 5  // 6 balls per over for semis/finals
+      : 4 * 5; // 4 balls per over for group stages
 
     const ballsLeft = totalBalls - oversPlayed;
 
