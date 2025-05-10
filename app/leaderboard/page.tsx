@@ -133,7 +133,7 @@ export default function LeaderboardPage() {
       // Initialize stats for both teams if not already present
       if (!newStats[team1])
         newStats[team1] = {
-          teamname: getTeamName(match, team1) || "",
+          teamname: teamData[getTeamName(match, team1)]?.name || "",
           group: teamData[getTeamName(match, team1)]?.group || "",
           played: 0,
           wins: 0,
